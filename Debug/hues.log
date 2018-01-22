@@ -1,0 +1,6 @@
+﻿  hue.c
+  ERIC --> using huewin.c
+  ERIC ------------> is __cplusplus
+  ERIC ------------> in ssl_ciphersuites.h
+c:\users\ehiller\dev\src\github.com\erichiller\hues\hue.c(132): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
+  hues.vcxproj -> C:\Users\ehiller\dev\src\github.com\erichiller\hues\Debug\hues.exe

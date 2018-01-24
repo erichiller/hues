@@ -1,6 +1,11 @@
-﻿  hue.c
+﻿  main.c
   ERIC --> using huewin.c
-  ERIC ------------> is __cplusplus
+c:\users\ehiller\dev\hues\hue.h(54): warning C4087: 'rand': declared with 'void' parameter list
+c:\users\ehiller\dev\hues\hue.h(56): warning C4087: 'rand': declared with 'void' parameter list
+c:\users\ehiller\dev\hues\hue.h(58): warning C4087: 'rand': declared with 'void' parameter list
+c:\users\ehiller\dev\hues\hue.h(63): warning C4087: 'rand': declared with 'void' parameter list
+c:\users\ehiller\dev\hues\hue.h(68): warning C4087: 'rand': declared with 'void' parameter list
+c:\users\ehiller\dev\hues\hue.h(73): warning C4087: 'rand': declared with 'void' parameter list
   ERIC ------------> in ssl_ciphersuites.h
-c:\users\ehiller\dev\src\github.com\erichiller\hues\hue.c(132): warning C4838: conversion from 'int' to 'char' requires a narrowing conversion
-  hues.vcxproj -> C:\Users\ehiller\dev\src\github.com\erichiller\hues\Debug\hues.exe
+  hues.vcxproj -> C:\Users\ehiller\dev\hues\Debug\hues.exe
+  hues.vcxproj -> C:\Users\ehiller\dev\hues\Debug\hues.pdb (Partial PDB)

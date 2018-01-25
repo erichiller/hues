@@ -1,11 +1,5 @@
 ﻿  main.c
   ERIC --> using huewin.c
-c:\users\ehiller\dev\hues\hue.h(54): warning C4087: 'rand': declared with 'void' parameter list
-c:\users\ehiller\dev\hues\hue.h(56): warning C4087: 'rand': declared with 'void' parameter list
-c:\users\ehiller\dev\hues\hue.h(58): warning C4087: 'rand': declared with 'void' parameter list
-c:\users\ehiller\dev\hues\hue.h(63): warning C4087: 'rand': declared with 'void' parameter list
-c:\users\ehiller\dev\hues\hue.h(68): warning C4087: 'rand': declared with 'void' parameter list
-c:\users\ehiller\dev\hues\hue.h(73): warning C4087: 'rand': declared with 'void' parameter list
   ERIC ------------> in ssl_ciphersuites.h
   hues.vcxproj -> C:\Users\ehiller\dev\hues\Debug\hues.exe
   hues.vcxproj -> C:\Users\ehiller\dev\hues\Debug\hues.pdb (Partial PDB)

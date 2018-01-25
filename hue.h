@@ -51,26 +51,26 @@ char *create_message(int time) {
 
 	//msg[19] = rand(0xff);
 
-	msg[19] = rand(0xee);
+	msg[19] = rand()% 0xee;
 	msg[20] = 0x00;
-	msg[21] = rand(0xca);
+	msg[21] = rand()% 0xca;
 	msg[22] = 0x00;
-	msg[23] = rand(0xfa);
+	msg[23] = rand()% 0xfa;
 	msg[24] = 0x00;
 	
 	// red
 	if (time % 3 == 0) {
-		msg[19] = rand(25) * 10;
+		msg[19] = (rand()% 25) * 10;
 		//msg[20] = 0xff;
 	}
 	// green
 	if (time % 2 == 0) {
-		msg[21] = rand(25) * 10;
+		msg[21] = (rand()%25) * 10;
 		//msg[22] = 0xff;
 	}
 	// blue
 	if (time % 4 == 0) {
-		msg[23] = rand(25) * 10;
+		msg[23] = (rand()% 25) * 10;
 		//msg[24] = 0xff;
 	}
 	

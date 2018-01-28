@@ -2,7 +2,8 @@
  * \file ccm.h
  *
  * \brief Counter with CBC-MAC (CCM) for 128-bit block ciphers
- *
+ */
+/*
  *  Copyright (C) 2006-2015, ARM Limited, All Rights Reserved
  *  SPDX-License-Identifier: Apache-2.0
  *
@@ -27,6 +28,10 @@
 
 #define MBEDTLS_ERR_CCM_BAD_INPUT      -0x000D /**< Bad input parameters to function. */
 #define MBEDTLS_ERR_CCM_AUTH_FAILED    -0x000F /**< Authenticated decryption failed. */
+
+#if !defined(MBEDTLS_CCM_ALT)
+// Regular implementation
+//
 
 #ifdef __cplusplus
 extern "C" {
@@ -124,6 +129,18 @@ int mbedtls_ccm_auth_decrypt( mbedtls_ccm_context *ctx, size_t length,
                       const unsigned char *add, size_t add_len,
                       const unsigned char *input, unsigned char *output,
                       const unsigned char *tag, size_t tag_len );
+
+#ifdef __cplusplus
+}
+#endif
+
+#else  /* !MBEDTLS_CCM_ALT */
+#include "ccm_alt.h"
+#endif /* !MBEDTLS_CCM_ALT */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if defined(MBEDTLS_SELF_TEST) && defined(MBEDTLS_AES_C)
 /**

@@ -19,7 +19,12 @@
 *  This file is part of mbed TLS (https://tls.mbed.org)
 **/
 
+#if defined(_WIN32)
 #include "huewin.h"
+#else
+#pragma message "not _WIN32 ---> using unistd.h"
+#include <unistd.h>
+#endif
 
 //#define SLEEP_PERIOD 1000000
 #define SLEEP_PERIOD 100000
@@ -27,6 +32,7 @@
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
+#pragma message "Using config from preprocessor macro MBEDTLS_CONFIG_FILE -> " MBEDTLS_CONFIG_FILEa
 #include MBEDTLS_CONFIG_FILE
 #endif
 

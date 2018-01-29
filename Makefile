@@ -1,20 +1,20 @@
 
 
-CFLAGS	?= -O2
-WARNING_CFLAGS ?= -Wall -W -Wdeclaration-after-statement
+CFLAGS	?= -O2 -fdiagnostics-color=always -g 
+WARNING_CFLAGS ?= -Wall -W
+# -Wdeclaration-after-statement
 LDFLAGS ?=
+DEBUG_CFLAGS ?=
 
-LOCAL_CFLAGS = $(WARNING_CFLAGS) -I . -D_FILE_OFFSET_BITS=64 -std=c99
+LOCAL_CFLAGS = $(WARNING_CFLAGS) -I . -D_FILE_OFFSET_BITS=64 
+# -std=c99
 LOCAL_LDFLAGS = -L./library 		\
 		-lmbedtls$(SHARED_SUFFIX)	\
 		-lmbedx509$(SHARED_SUFFIX)	\
-		-lmbedcrypto$(SHARED_SUFFIX)
+		-lmbedcrypto$(SHARED_SUFFIX)\
+		-lwiringPi -lm
 
 
-#gcc -lmbedtls -lmbedx509 -lmbedcrypto -B lib -I . -std=c11 main.c
-
-
-#CC = gcc
 
 main:
-	$(CC) $(LOCAL_CFLAGS) $(CFLAGS) main.c $(LOCAL_LDFLAGS) $(LDFLAGS)
+	$(CC) $(LOCAL_CFLAGS) $(DEBUG_CFLAGS) $(CFLAGS) main.cpp WireShim.cpp Adafruit_TCS34725.cpp $(LOCAL_LDFLAGS) $(LDFLAGS)

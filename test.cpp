@@ -87,14 +87,16 @@ int main(){
     g = green;  g /= sum;   g *= 255;
     b = blue;   b /= sum;   b *= 255;
 
-    int redi = red >> 8;
-    int blui = blue >> 8;
-    int grni = green >> 8;
+    
+    // float r6, g6, b6;
+    // r = red;    r /= sum;   r *= 256;
+    // g = green;  g /= sum;   g *= 256;
+    // b = blue;   b /= sum;   b *= 256;
 
     printf("Clr:\t%u | %X\n", clear, clear);
-    printf("\tRed:\t%u | %X //clrd= %X (%i)=(%f) // 8shift=%X(%i)\n", red, red, (int)r, (int)r, r, redi, redi);
-    printf("\tGrn:\t%u | %X //clrd= %X (%i)=(%f) // 8shift=%X(%i)\n", green, green, (int)g, (int)g, g, grni, grni);
-    printf("\tBlu:\t%u | %X //clrd= %X (%i)=(%f) // 8shift=%X(%i)\n", blue, blue, (int)b, (int)b, b,blui,blui);
+    printf("\tRed:\t%u | %X //clrd= %X (%i)=(%f) // gamma=%X(%i)\n", red, red, (int)r, (int)r, r,gammatable[(int)r], gammatable[(int)r]);
+    printf("\tGrn:\t%u | %X //clrd= %X (%i)=(%f) // gamma=%X(%i)\n", green, green, (int)g, (int)g, g,gammatable[(int)g], gammatable[(int)g]);
+    printf("\tBlu:\t%u | %X //clrd= %X (%i)=(%f) // gamma=%X(%i)\n", blue, blue, (int)b, (int)b, b,gammatable[(int)b], gammatable[(int)b]);
     printf("  -->Color Temperature (K):\t%i", tcs.calculateColorTemperature(red,green,blue));
     printf("\n");
 

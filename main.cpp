@@ -26,6 +26,10 @@
 #include <unistd.h>
 #endif
 
+#include "config.h"
+#include <stdint.h>
+
+
 //#define SLEEP_PERIOD 1000000
 #define SLEEP_PERIOD 100000
 
@@ -73,20 +77,11 @@ int main(void)
 #include "mbedtls/certs.h"
 #include "mbedtls/timing.h"
 
-/*
-#include "mbedtls/ssl_ciphersuites.h"
-#include "mbedtls/x509_crt.h"
-*/
-
-
 #define SERVER_PORT "2100"
 #define SERVER_NAME "Hue"
 #define SERVER_ADDR "192.168.10.46" /* forces IPv4 */
 #define MESSAGE     "Echo this"
 
-/* DIFFERENCE HERE! */
-/* #define DFL_PSK_IDENTITY        "T-pjPhprtJul3wEBGejefzZ67Eg1LWmsgU-ZJlm2" */
-/*#define DFL_PSK_IDENTITY "XO3rCiWc269m6rk5wv1OZzudn9PCkAY-JcRMby8x" */
 #define DFL_PSK_IDENTITY "PKSaPQW6j-vRpcn9UPoNZ3Olm-Dd0EU0q-K9m-f7"
 #define HUB_USER DFL_PSK_IDENTITY
 #define ENTERTAINMENT_GROUP "2"
@@ -98,6 +93,56 @@ int main(void)
 
 /* Last order of business: CHECK CONFIG VALIDITY! */
 #include "mbedtls/check_config.h"
+
+
+int loop(mbedtls_ssl_context *ssl){
+	int ret, len, i;
+	i = 0;
+	
+	char message_template[] = {
+		'H', 'u', 'e', 'S', 't', 'r', 'e', 'a', 'm', //protocol (9)
+		0x01, 0x00, //version 1.0 (2)
+		0x01, //sequence number 1 (not observed) (1)
+		0x00, 0x00, //reserved (2)
+		0x00, //color mode RGB (1)
+		0x00, //reserved (1)
+			  //// light command #1 (up to 10)
+			  0x00, 0x00, 0x0d, //light 13
+			  0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // color
+	};
+	char *message = (char*) &message_template;
+	while (1) {
+		//message_time(i, &message);
+		uint16_t red  = 0xaaff;
+		uint16_t green = 0x1234;
+		uint16_t blue = 0x5678;
+		
+		create_message(message, LIGHT_ID, red, green, blue);
+		//len = sizeof(message);
+		len = 25;
+
+		mbedtls_printf("\n  . Writing message ----> {%s}[%i]\n>>>>START>>>>", message, sizeof(message));
+
+
+		for (int j = 0; j < len;j++)
+			mbedtls_printf("%x ", message[j]);
+
+		do ret = mbedtls_ssl_write(ssl, (unsigned char *)message, len);
+		while (ret == MBEDTLS_ERR_SSL_WANT_READ ||
+			ret == MBEDTLS_ERR_SSL_WANT_WRITE);
+
+		if (ret < 0)
+		{
+			mbedtls_printf(" failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
+			return ret;
+		}
+		mbedtls_printf("\n <----MESSAGE--!\n  ! wrote %s\n\n", message);
+
+		usleep(SLEEP_PERIOD);
+		i++;
+	}
+	return 0;
+}
 
 
 static void my_debug(void *ctx, int level,
@@ -322,32 +367,8 @@ send_request:
 	// create message space
 	//char *mmessage = malloc(25 * sizeof(char));
 
-	int i = 0;
-	while (1) {
-		//message_time(i, &message);
-		char *message = create_message(i);
-		//len = sizeof(message);
-		len = 25;
-
-		mbedtls_printf("\n  . Writing message ----> {%s}[%i]\n>>>>START>>>>", message, sizeof(message));
-
-
-		for (int j = 0; j < len;j++)
-			mbedtls_printf("%x", message[j]);
-
-		do ret = mbedtls_ssl_write(&ssl, (unsigned char *)message, len);
-		while (ret == MBEDTLS_ERR_SSL_WANT_READ ||
-			ret == MBEDTLS_ERR_SSL_WANT_WRITE);
-
-		if (ret < 0)
-		{
-			mbedtls_printf(" failed\n  ! mbedtls_ssl_write returned %d\n\n", ret);
-			goto exit;
-		}
-		mbedtls_printf("\n <----MESSAGE--!\n  ! wrote %s\n\n", message);
-
-		usleep(SLEEP_PERIOD);
-		i++;
+	if ( !loop(&ssl) ){
+		goto exit;
 	}
 
 	/*

@@ -39,10 +39,10 @@ class tcs34725 {
 public:
   tcs34725(void);
 
-  bool begin(void);
+  boolean begin(void);
   void getData(void);  
 
-  bool isAvailable, isSaturated;
+  boolean isAvailable, isSaturated;
   uint16_t againx, atime, atime_ms;
   uint16_t r, g, b, c;
   uint16_t ir; 
@@ -81,7 +81,7 @@ tcs34725::tcs34725() : agc_cur(0), isAvailable(0), isSaturated(0) {
 }
 
 // initialize the sensor
-bool tcs34725::begin(void) {
+boolean tcs34725::begin(void) {
   tcs = Adafruit_TCS34725(agc_lst[agc_cur].at, agc_lst[agc_cur].ag);
   if ((isAvailable = tcs.begin())) 
     setGainTime();

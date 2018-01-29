@@ -1,0 +1,10 @@
+{
+	"files.associations": {
+		"*.txt": "markdown",
+		"*_vimrc": "viml",
+		"CMakeLists.txt": "cmake",
+		"initializer_list": "cpp",
+		"xutility": "cpp",
+		"istream": "cpp"
+	}
+}

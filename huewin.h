@@ -1,5 +1,6 @@
 
 #if defined(_WIN32)
+#pragma message( "ERIC --> using huewin.c" )  
 #include <windows.h>
 
 static inline void usleep(__int64 usec)
@@ -15,5 +16,4 @@ static inline void usleep(__int64 usec)
 	CloseHandle(timer);
 }
 
-#pragma message( "ERIC --> using huewin.c" )  
 #endif // WIN32

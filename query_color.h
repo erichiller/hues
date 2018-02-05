@@ -5,7 +5,9 @@
 
 Adafruit_TCS34725 tcs = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_24MS, TCS34725_GAIN_16X);
 int tcs_status = false;
+#ifdef ENABLE_GAMMATABLE
 char gammatable[256];
+#endif
 
 void logm(char const * str){
 	printf("%s\n",str);
@@ -21,6 +23,7 @@ int colorme(uint16_t *red, uint16_t *green, uint16_t *blue){
 			return 1;
 		}
 		tcs_status = true;
+#ifdef ENABLE_GAMMATABLE
 		for (int i=0; i<256; i++) {
 			float x = i;
 			x /= 255;
@@ -29,6 +32,7 @@ int colorme(uint16_t *red, uint16_t *green, uint16_t *blue){
 				
 			gammatable[i] = x;
 		}
+#endif
 	}
 
 	uint16_t clear;
@@ -40,10 +44,11 @@ int colorme(uint16_t *red, uint16_t *green, uint16_t *blue){
     b = *blue;   b /= clear;   b *= 0xffff;
 
 
-
-	// r = *red;    r /= clear;   r = gammatable[(int)(r * 0xff)];	r *= 0xff;
-    // g = *green;  g /= clear;   g = gammatable[(int)(g * 0xff)];	g *= 0xff;
-    // b = *blue;   b /= clear;   b = gammatable[(int)(b * 0xff)];	b *= 0xff;
+#ifdef ENABLE_GAMMATABLE
+	r = *red;    r /= clear;   r = gammatable[(int)(r * 0xff)];	r *= 0xff;
+	g = *green;  g /= clear;   g = gammatable[(int)(g * 0xff)];	g *= 0xff;
+	b = *blue;   b /= clear;   b = gammatable[(int)(b * 0xff)];	b *= 0xff;
+#endif
 
 	*red = r;
 	*green = g;

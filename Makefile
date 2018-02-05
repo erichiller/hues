@@ -6,7 +6,7 @@ WARNING_CFLAGS ?= -Wall -W
 LDFLAGS ?=
 DEBUG_CFLAGS ?=
 
-LOCAL_CFLAGS = $(WARNING_CFLAGS) -I . -D_FILE_OFFSET_BITS=64 
+LOCAL_CFLAGS = $(WARNING_CFLAGS) -I . -D_FILE_OFFSET_BITS=64 -o gohuesgocs
 # -std=c99
 LOCAL_LDFLAGS = -L./library 		\
 		-lmbedtls$(SHARED_SUFFIX)	\
@@ -17,4 +17,4 @@ LOCAL_LDFLAGS = -L./library 		\
 
 
 main:
-	$(CC) $(LOCAL_CFLAGS) $(DEBUG_CFLAGS) $(CFLAGS) main.cpp WireShim.cpp Adafruit_TCS34725.cpp $(LOCAL_LDFLAGS) $(LDFLAGS)
+	$(CC) $(LOCAL_CFLAGS) $(DEBUG_CFLAGS) $(CFLAGS) _hues.cpp WireShim.cpp Adafruit_TCS34725.cpp $(LOCAL_LDFLAGS) $(LDFLAGS)

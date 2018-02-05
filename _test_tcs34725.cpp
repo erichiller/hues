@@ -1,3 +1,8 @@
+/*
+This program is for debugging only
+It only reads back received values from the TCS34725 received over i2c
+*/
+
 #include "Adafruit_TCS34725.h"
 #include <stdio.h>
 #include <math.h>

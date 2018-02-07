@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "Adafruit_TCS34725.h"
+#include "Adafruit_TCS34725/Adafruit_TCS34725.h"
 #include <math.h>
 
 
@@ -8,10 +8,6 @@ int tcs_status = false;
 #ifdef ENABLE_GAMMATABLE
 char gammatable[256];
 #endif
-
-void logm(char const * str){
-	printf("%s\n",str);
-}
 
 int colorme(uint16_t *red, uint16_t *green, uint16_t *blue){
 	if( !tcs_status ){

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "config.h"
 #include "SerialPort.h"
@@ -22,8 +23,37 @@ char incomingData[MAX_DATA_LENGTH];
 
 SerialPort arduino(port_name);
 
+// bool str_to_uint16(const char *str, uint16_t *res) {
+//     char *end;
+//     errno = 0;
+//     unsigned long val = strtoul(str, &end, 10);
+//     if (errno || end == str || *end != '\0' || val < 0 || val >= 0x10000) {
+// 		logm("str_to_uint16 false!");
+//         return false;
+//     }
+//     *res = (uint16_t)val;
+// 	printf("{str=%s}{val_LONG_=%ld}{res_uint16_t=%" PRIu16 "}\n", str, val, res);	
+//     return true;
+// }
+
+static bool
+str_to_uint16(const char *str, uint16_t *res)
+{
+  char *end;
+  errno = 0;
+unsigned long val = strtoul(str, &end, 10);
+
+//   intmax_t val = strtoimax(str, &end, 10);
+  if (errno == ERANGE || val < 0 || val > UINT16_MAX || end == str || *end != '\0') { return false; }
+  *res = (uint16_t) val;
+
+//   printf("{str=%s}{val_LONG_=%ld}{res_uint16_t=%" PRIu16 "}{res_uint16_tddd=%" PRId16 "}\n", str, val, *res, *res);	
+  
+  return true;
+}
+
 // parses incomingData from serial received data and returns number of tokens found
-int token_parser(){
+int token_parser(uint16_t *red, uint16_t *green, uint16_t *blue ){
 	char rx[MAX_DATA_LENGTH];	
 
 	strcpy( rx, incomingData );
@@ -32,28 +62,33 @@ int token_parser(){
 	char *rx_str_state;
 	char *color_state;
 	int counter_tokens = 0;
+	int counter_errors_non_numeric = 0;
+	int counter_errors_incomplete_colors = 0;
 
 	char *token = strtok_s(rx, ";", &rx_str_state);
 	while( token != NULL){
-		counter_tokens++;
 		// printf("token->%s\n",token);
+		if ( !isdigit(token[0] ) ) {
+			counter_errors_non_numeric++; 
+			// if the token isn't a digit, log an error and continue
+			// printf("non digit found in token: ");
+			// puts(token);
+		} else {
+			printf("current working token=<%s>\n", token);
+			char *color_component = strtok_s(token, ",", &color_state);
+			int color = 0;
+			while( color_component != NULL ){
+				color++;
+				if ( color == 1 ) { str_to_uint16(color_component, red);   printf("<<color_component [%s] (  red  ) is now int=%" PRIu16 ">>\n", color_component, *red); }
+				if ( color == 2 ) { str_to_uint16(color_component, green); printf("<<color_component [%s] ( green ) is now int=%" PRIu16 ">>\n", color_component, *green); }
+				if ( color == 3 ) { str_to_uint16(color_component, blue);  printf("<<color_component [%s] (  blue ) is now int=%" PRIu16 ">>\n", color_component, *blue); }
 
-		char *color_component = strtok_s(token, ",", &color_state);
-		int color = 0;
-		int red = 0;
-		int green = 0;
-		int blue = 0;
-		while( color_component != NULL ){
-			color++;
-			if ( color == 1 ) red = atoi(color_component);
-			if ( color == 2 ) green = atoi(color_component);
-			if ( color == 3 ) blue = atoi(color_component);
-
-			//   printf("color_component->%s\n",color_component);      
-			color_component = strtok_s(NULL, ",", &color_state);
-		}
-		if ( green != 0 || blue != 0 ) {
-			printf(" ---> !! NOTICE !! found a color with component green [%i/%X] or blue[%i/%X]\n",green,green,blue,blue);
+				//   printf("color_component->%s\n",color_component);
+				color_component = strtok_s(NULL, ",", &color_state);
+			}
+			// less then 3 colors were seen - error! probably the message stopped halfway through, it could be reconstructed by concat the next one, but meh.
+			if ( color == 3 ) { counter_tokens++; } else { counter_errors_incomplete_colors++; }
+			printf("Colors:\n\t\n\tRed:\t%" PRIu16 "\n\tGreen:\t%" PRIu16 "\n\tblue:\t%" PRIu16 "\n", *red, *green, *blue);
 		}
 		token = strtok_s(NULL, ";", &rx_str_state);    
 	}
@@ -63,7 +98,7 @@ int token_parser(){
 	return counter_tokens;
 }
 
-uint32_t serial_receive_data(){
+uint32_t serial_receive_colors(uint16_t *red, uint16_t *green, uint16_t *blue ){
 	// SerialPort arduino(port_name);
 	if (arduino.isConnected()) cout << "Connection Established" << endl;
 	else cout << "ERROR, check port name";
@@ -75,22 +110,24 @@ uint32_t serial_receive_data(){
 		//prints out data
 		// puts(incomingData);
 
-		if (counter_rx < 5){
+/** 
+// DEBUG HERE ,,, UNCOMMENT THIS
+		if (counter_rx >= 5){
 			printf("receved 5\n");
 			exit(0);
 		} else {
 			printf("counter_rx=%i\n",counter_rx);
 		}
-		counter_rx++;
+ **/
+		int rx = token_parser(red, green, blue);
+		counter_rx += rx;
+		if( rx ) return 0;
 
-		// printf("sizeRxD=%i", sizeof(incomingData));
-		token_parser();
-		//wait a bit
 #ifdef SERIAL_PORT_SLEEP
 		Sleep(SERIAL_PORT_SLEEP);
 #endif
 	}
-	return 0;
+	return 1;
 }
 
 int serial_send_data(char *buffer,  unsigned int buf_size){
@@ -107,6 +144,39 @@ int serial_send_data(char *buffer,  unsigned int buf_size){
 
 }
 
+// uint32_t serial_receive_data(){
+// 	// SerialPort arduino(port_name);
+// 	if (arduino.isConnected()) cout << "Connection Established" << endl;
+// 	else cout << "ERROR, check port name";
+	
+// 	int counter_rx = 0;
+// 	while (arduino.isConnected()){
+// 		//Check if data has been read or not
+// 		int read_result = arduino.readSerialPort(incomingData, MAX_DATA_LENGTH);
+// 		//prints out data
+// 		// puts(incomingData);
+
+// 		// if (counter_rx < 5){
+// 		// 	printf("receved 5\n");
+// 		// 	exit(0);
+// 		// } else {
+// 		// 	printf("counter_rx=%i\n",counter_rx);
+// 		// }
+// 		// counter_rx++;
+// 		uint16_t *red = NULL;
+// 		uint16_t *green = NULL;
+// 		uint16_t *blue = NULL;
+// 		// printf("sizeRxD=%i", sizeof(incomingData));
+// 		if( token_parser(red, green, blue) ){
+// 			return 0;
+// 		}
+// 		//wait a bit
+// #ifdef SERIAL_PORT_SLEEP
+// 		Sleep(SERIAL_PORT_SLEEP);
+// #endif
+// 	}
+// 	return 1;
+// }
 
 /**
  *  F:\Users\ehiller\dev\src\github.com\erichiller\hues\

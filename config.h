@@ -7,18 +7,19 @@
 #define RASPBERRY_PI
 #define LOG_LEVEL 2
 
-
-/* SerialPort */
-
-#define ARDUINO_WAIT_TIME 5000
-// #define MAX_DATA_LENGTH 255
-#define MAX_DATA_LENGTH 255
+#define logm(message) \
+	printf("LOG ---- %s : %i ----\n", __FILE__, __LINE__); \
+	printf("LOG:\t%s\n", message);
 
 
+/////////////////////////////////
+// CONFIGURE COLOR DATA SOURCE //
+//  ONLY __1__ CAN BE ACTIVE!  //
+/////////////////////////////////
+// #define SOURCE_TCS34725
+#define SOURCE_SERIAL_SOUND
 
 /* hue stream , mbedtls */
-
-#define MESSAGE_SOURCE TCS34725
 
 #define LIGHT_ID 0x0d
 
@@ -36,11 +37,26 @@
 
 #define DEBUG_LEVEL 0
 
+/* mbedtls */
+//#define SLEEP_PERIOD 1000000
+#define SLEEP_PERIOD 100000
+
 // #define ENABLE_GAMMATABLE /* enabling gammatable will attempt to adjust for how the human eye sees **/
 
 
 
 
+/* SerialPort */
+
+#define ARDUINO_WAIT_TIME 0
+// #define MAX_DATA_LENGTH 255
+#define MAX_DATA_LENGTH 255
+
+
+// void logm(const char* file, const char* line, const char* func, char const * str){
+// 	printf("LOG ---- %s : %s , %s ----", file, line, func);
+// 	printf("LOG:\t%s\n",str);
+// } 
 
 
 #endif

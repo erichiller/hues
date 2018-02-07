@@ -13,8 +13,3 @@
 #define mbedtls_fprintf    fprintf
 #endif
 
-
-/* Eric's Constants, do not modify */
-
-#define SOURCE_TCS34725 1
-#define SOURCE_SERIAL_SOUND 2

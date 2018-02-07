@@ -7,6 +7,7 @@
 
 #include "SerialPort.h"
 #include "config.h"
+#include "huewin.h"
 
 SerialPort::SerialPort(char *portName)
 {
@@ -48,7 +49,9 @@ SerialPort::SerialPort(char *portName)
             else {
                 this->connected = true;
                 PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
-                Sleep(ARDUINO_WAIT_TIME);
+#if ARDUINO_WAIT_TIME > 0
+                usleep(ARDUINO_WAIT_TIME);
+#endif
             }
         }
     }

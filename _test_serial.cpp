@@ -8,20 +8,9 @@
 
 
 
-#define FREQUNCY_BINS 1
-
 int main(){
+	
 
-
-	for (int i = 0; i < FREQUNCY_BINS; ++i) {
-		printf("in ++i and i=%i\n", i);
-	}
-	printf("----\n\n");
-
-	for (int i = 0; i < FREQUNCY_BINS; i++) {
-		printf("in i++ and i=%i\n", i);
-	}
-	exit(0);
 
 
 	// for (int i = 0; i < sizeof(test); i++) {

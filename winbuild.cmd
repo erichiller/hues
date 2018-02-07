@@ -1,0 +1,1 @@
+cl /FC /EHsc F:\Users\ehiller\dev\src\github.com\erichiller\hues\_test_hue_http.cpp /link /LIBPATH:F:\Users\ehiller\dev\src\github.com\erichiller\hues\ /DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "Ws2_32.lib" "shell32.lib" "library\mbedTLS.lib" "msvcrt.lib" /NXCOMPAT /OUT:gohue.exe /NODEFAULTLIB:library

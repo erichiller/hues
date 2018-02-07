@@ -31,11 +31,6 @@
 #include <string.h>
 #include "hue.h"
 
-
-
-//#define SLEEP_PERIOD 1000000
-#define SLEEP_PERIOD 100000
-
 #if !defined(MBEDTLS_SSL_CLI_C) || !defined(MBEDTLS_SSL_PROTO_DTLS) ||    \
     !defined(MBEDTLS_NET_C)  || !defined(MBEDTLS_TIMING_C) ||             \
     !defined(MBEDTLS_ENTROPY_C) || !defined(MBEDTLS_CTR_DRBG_C) ||        \
@@ -69,7 +64,7 @@ int loop(mbedtls_ssl_context *ssl){
 	int ret, len, i;
 	i = 0;
 	
-	char message_template[] = {
+	unsigned char message_template[] = {
 		'H', 'u', 'e', 'S', 't', 'r', 'e', 'a', 'm', //protocol (9)
 		0x01, 0x00, //version 1.0 (2)
 		0x01, //sequence number 1 (not observed) (1)
@@ -80,25 +75,18 @@ int loop(mbedtls_ssl_context *ssl){
 			  0x00, 0x00, 0x0d, //light 13
 			  0x00, 0x00, 0x00, 0x00, 0x00, 0x00 // color
 	};
-	char *message = (char*) &message_template;
+	unsigned char *message = (unsigned char*) &message_template;
 	while (1) {
 		//message_time(i, &message);
 		uint16_t red  = 0xaaff;
 		uint16_t green = 0x1234;
 		uint16_t blue = 0x5678;
 
-#if MESSAGE_SOURCE == SOURCE_TCS34725
 		if ( create_message(message, LIGHT_ID, red, green, blue) ) {
 			// create message returned an error
 			mbedtls_printf(" create message returned an error\n Exiting\n\n");
 			exit(1);
 		}
-#elif MESSAGE_SOURCE == SOURCE_SERIAL_SOUND
-		if 
-#else
-		mbedtls_printf("\n  . NO MESSAGE SOURCE WAS DEFINED....\n EXITING...\n\n");
-		exit(1);
-#endif
 		//len = sizeof(message);
 		len = 25;
 
@@ -138,6 +126,9 @@ int main(int argc, char *argv[])
 	mbedtls_printf("\n  . Starting program...");
 	mbedtls_printf("\n  . ERIC ----> check on MBEDTLS_NET_PROTO_UDP: %i", MBEDTLS_NET_PROTO_UDP);
 	mbedtls_printf("\n  . ERIC ----> check on MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256: %X", MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256);
+
+	logm("test123");
+	exit(1);
 	
 	int ret, len;
 	mbedtls_net_context server_fd;

@@ -35,10 +35,12 @@
     @brief  Implements missing powf function
 */
 /**************************************************************************/
+#ifndef _WIN32
 float powf(const float x, const float y)
 {
   return (float)(pow((double)x, (double)y));
 }
+#endif 
 
 /**************************************************************************/
 /*!

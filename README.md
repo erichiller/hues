@@ -1,7 +1,4 @@
-# Adafruit TCS34725 Color Sensor Driver in C for Raspberry Pi
-_Modified from Adafruit_
-
-This driver is for the [Adafruit TCS34725 Breakout](http://www.adafruit.com/products/1334).
+# project notes
 
 
 ## Compilation
@@ -10,27 +7,27 @@ This driver is for the [Adafruit TCS34725 Breakout](http://www.adafruit.com/prod
 
 `-lm` is linking to lib math
 
+
+### Compiling on Windows
+
 ```
 scp * lighthouse:/root/dev/huesy ; echo "**********************`n* connecting via ssh *`n* running gcc        *`n**********************"; ssh lighthouse "cd ~/dev/huesy; gcc -g -o hues test.cpp WireShim.cpp Adafruit_TCS34725.cpp -fdiagnostics-color=always -lwiringPi -lm"
 ```
 
 
 
-## About this Driver
+```
+cl /EHsc F:\Users\ehiller\dev\src\github.com\erichiller\hues\_test_serial.cpp F:\Users\ehiller\dev\src\github.com\erichiller\hues\SerialPort.cpp
 
-These modules use I2C to communicate, 2 pins are required to  
-interface
-**Adafruit invests time and resources providing this open source code, please support Adafruit and open-source hardware by purchasing products from Adafruit!**
 
-Written by Kevin (KTOWN) Townsend for Adafruit Industries.
-BSD license, check license.txt for more information
+cl /FC /EHsc F:\Users\ehiller\dev\src\github.com\erichiller\hues\_hues.cpp F:\Users\ehiller\dev\src\github.com\erichiller\hues\SerialPort.cpp /link /LIBPATH:F:\Users\ehiller\dev\src\github.com\erichiller\hues\ /DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "ole32.lib" "oleaut32.lib" "uuid.lib" "odbc32.lib" "odbccp32.lib" "library\mbedTLS.lib" "msvcrt.lib" /NXCOMPAT /OUT:gohue.exe
 
-All text above must be included in any redistribution
+cl /FC /EHsc F:\Users\ehiller\dev\src\github.com\erichiller\hues\_hues.cpp F:\Users\ehiller\dev\src\github.com\erichiller\hues\SerialPort.cpp /link /LIBPATH:F:\Users\ehiller\dev\src\github.com\erichiller\hues\ /DYNAMICBASE "kernel32.lib" "user32.lib" "gdi32.lib" "winspool.lib" "comdlg32.lib" "advapi32.lib" "shell32.lib" "library\mbedTLS.lib" "msvcrt.lib" /NXCOMPAT /OUT:gohue.exe /NODEFAULTLIB:library
 
-To download. click the ZIP button in the top bar, and check this tutorial
-for instructions on how to install: 
-http://learn.adafruit.com/adafruit-all-about-arduino-libraries-install-use
+```
 
+this will fix many microsoft windows build errors:
+<https://stackoverflow.com/questions/40230731/unresolved-externals-when-compiling-with-freetype>
 
 ## Sound to Hues
 
@@ -88,5 +85,13 @@ h1 = hue / 60
 x = chroma * (1.0 - absolute(h1 % 2.0) - 1.0 )
 
 Using *Saturation*, we can add red or the other non-primary color(s) into the bin.
+
+
+# More TCS tests
+**At night**
+eb 84 14 7a 1e b8
+
+**In a black bag**
+ff ff 0 0 0 0
 
 

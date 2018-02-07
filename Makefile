@@ -17,4 +17,4 @@ LOCAL_LDFLAGS = -L./library 		\
 
 
 main:
-	$(CC) $(LOCAL_CFLAGS) $(DEBUG_CFLAGS) $(CFLAGS) _hues.cpp WireShim.cpp Adafruit_TCS34725.cpp $(LOCAL_LDFLAGS) $(LDFLAGS)
+	$(CC) $(LOCAL_CFLAGS) $(DEBUG_CFLAGS) $(CFLAGS) _hues.cpp WireShim.cpp Adafruit_TCS34725/Adafruit_TCS34725.cpp $(LOCAL_LDFLAGS) $(LDFLAGS)

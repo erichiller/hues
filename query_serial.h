@@ -9,8 +9,6 @@
 #include "config.h"
 #include "SerialPort.h"
 
-#define SERIAL_PORT_SLEEP 1000
-
 using std::cout;
 using std::endl;
 
@@ -23,18 +21,16 @@ char incomingData[MAX_DATA_LENGTH];
 
 SerialPort arduino(port_name);
 
-static bool
-str_to_uint16(const char *str, uint16_t *res)
-{
-  char *end;
-  errno = 0;
-unsigned long val = strtoul(str, &end, 10);
+static bool str_to_uint16(const char *str, uint16_t *res){
+	char *end;
+	errno = 0;
+	unsigned long val = strtoul(str, &end, 10);
 
-//   intmax_t val = strtoimax(str, &end, 10);
-  if (errno == ERANGE || val < 0 || val > UINT16_MAX || end == str || *end != '\0') { return false; }
-  *res = (uint16_t) val;
+	if (errno == ERANGE || val < 0 || val > UINT16_MAX || end == str || *end != '\0') { return false; }
+	
+	*res = (uint16_t) val;
 
-  return true;
+	return true;
 }
 
 // parses incomingData from serial received data and returns number of tokens found
@@ -105,11 +101,22 @@ int token_parser(uint16_t *red, uint16_t *green, uint16_t *blue ){
 	return counter_tokens;
 }
 
+
+
+
+
 // return the number of colors received
 uint32_t serial_receive_colors(uint16_t *red, uint16_t *green, uint16_t *blue ){
 	// SerialPort arduino(port_name);
-	if (arduino.isConnected()) cout << "Connection Established" << endl;
-	else cout << "ERROR, check port name";
+	if (arduino.isConnected()){
+#ifdef DEBUG
+		printf("Serial Connection Ok, serial_receive_colors(...)\n");
+#endif
+	} else {
+		logm("ERROR, SERIAL CONNECTION FAILED IN READ. check port name");
+		// ERROR
+		return 0;
+	}
 	
 	int counter_rx = 0;
 	while (arduino.isConnected()){
@@ -129,14 +136,17 @@ uint32_t serial_receive_colors(uint16_t *red, uint16_t *green, uint16_t *blue ){
  **/
 		int rx = token_parser(red, green, blue);
 		counter_rx += rx;
-		if( rx ) return 0;
+		if( rx ) return counter_rx;
 
 #ifdef SERIAL_PORT_SLEEP
 		Sleep(SERIAL_PORT_SLEEP);
 #endif
 	}
-	return 1;
+	return counter_rx;
 }
+
+
+
 
 int serial_send_data(char *buffer,  unsigned int buf_size){
 	if (arduino.isConnected()) cout << "Connection Ok, Data Sending..." << endl;

@@ -18,8 +18,9 @@
 #define HTTP_POST "POST"
 #define HTTP_PUT  "PUT"
 
-int http_request( char* host, int port, char* url, const char request_type[], char* content_type, char* data, size_t data_length )
+int http_request( char* host, int port, char* url, const char request_type[], char* content_type, char* data, size_t data_length, const char* find_success_str )
 {
+    int found = 0;
     int ret = 0, len, server_fd = 0;
     unsigned char buf[1024];
     struct sockaddr_in server_addr;
@@ -33,10 +34,9 @@ int http_request( char* host, int port, char* url, const char request_type[], ch
     /*
      * Init WSA
      */
-    if( WSAStartup(MAKEWORD(2, 0), &wsaData ) != 0 )
-    {
-    printf( " WSAStartup() failed\n" );
-    goto exit;
+    if( WSAStartup(MAKEWORD(2, 0), &wsaData ) != 0 ){
+        printf( " WSAStartup() failed\n" );
+        goto exit;
     }
 #endif
 
@@ -110,6 +110,11 @@ int http_request( char* host, int port, char* url, const char request_type[], ch
 #else
         ret = read( server_fd, buf, len );
 #endif
+        if(strstr( (char *) buf, find_success_str) != NULL) {
+		    found = 1;
+	    }
+
+
 
         if( ret <= 0 ){
             printf( "\n %d bytes read ; page complete\n\n", ret );
@@ -136,5 +141,5 @@ exit:
 //     fflush( stdout ); getchar();
 // #endif
 
-    return( ret );
+    return( found );
 }

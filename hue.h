@@ -10,9 +10,6 @@
 #endif
 
 
-
-
-
 /* returns the received number of colors */
 int create_message(unsigned char *msg, char light_id, uint16_t red, uint16_t green, uint16_t blue){
 	// int lights = 1;
@@ -54,12 +51,26 @@ int hue_begin_stream(){
 	char data[] = "{\"stream\": {\"active\": true}}";
 	char url[1024];
 	// char *success = "success";
-	mbedtls_snprintf(url, 1023, "/api/%s/groups/%s", HUB_USER, ENTERTAINMENT_GROUP);	
-	http_request(SERVER_ADDR, 80, url, HTTP_PUT, "application/json", (char*)data , sizeof(data));
-
-	mbedtls_printf("\n  . Setting Entertainment mode on the hub for url %s", url);
-	if(strstr(url, "success") != NULL) {
+	mbedtls_snprintf(url, 1023, "/api/%s/groups/%s", HUB_USER, ENTERTAINMENT_GROUP);
+	mbedtls_printf("\n  . Setting Entertainment mode on the hub for url %s", url);	
+	if ( http_request(SERVER_ADDR, 80, url, HTTP_PUT, "application/json", (char*)data , sizeof(data), "success") ){
+		printf("entertainment mode is on");
 		return true;
 	}
+	return false;
+}
+
+
+int hue_end_stream(){
+	char data[] = "{\"stream\": {\"active\": false}}";
+	char url[1024];
+	// char *success = "success";
+	mbedtls_snprintf(url, 1023, "/api/%s/groups/%s", HUB_USER, ENTERTAINMENT_GROUP);	
+	if ( http_request(SERVER_ADDR, 80, url, HTTP_PUT, "application/json", (char*)data , sizeof(data) , "success") ){
+		printf("entertainment mode is off");
+		return true;
+	}
+
+	
 	return false;
 }

@@ -8,8 +8,8 @@
 #define LOG_LEVEL 2
 
 #define logm(message) \
-	printf("LOG ---- %s : %i ----\n", __FILE__, __LINE__); \
-	printf("LOG:\t%s\n", message);
+	printf("\nLOG:\t (src) %s : %i ----\n", __FILE__, __LINE__); \
+	printf("LOG:\t(msg) %s\n", message);
 
 
 /////////////////////////////////
@@ -37,9 +37,11 @@
 
 #define DEBUG_LEVEL 0
 
+
 /* mbedtls */
 //#define SLEEP_PERIOD 1000000
-#define SLEEP_PERIOD 100000
+// #define SLEEP_PERIOD 100000
+#define SLEEP_PERIOD 50000
 
 // #define ENABLE_GAMMATABLE /* enabling gammatable will attempt to adjust for how the human eye sees **/
 
@@ -50,7 +52,10 @@
 
 #define ARDUINO_WAIT_TIME 0
 // #define MAX_DATA_LENGTH 255
-#define MAX_DATA_LENGTH 255
+#define MAX_DATA_LENGTH 64
+
+// #define SERIAL_PORT_SLEEP 1000
+#define SERIAL_PORT_SLEEP 500
 
 
 // void logm(const char* file, const char* line, const char* func, char const * str){
@@ -58,6 +63,13 @@
 // 	printf("LOG:\t%s\n",str);
 // } 
 
+
+/** POST CONFIG PROCESSING 
+ * DO NOT EDIT BENEATH HERE**/
+#if DEBUG_LEVEL > 0
+#pragma message("NOTE ---> DEBUG MESSAGES ENABLED")
+#define DEBUG
+#endif
 
 #endif
 

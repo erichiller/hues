@@ -7,7 +7,12 @@
 
 #include "SerialPort.h"
 #include "config.h"
-#include "huewin.h"
+#include "winshim.h"
+
+
+// #define SERIAL_FILE_ATTRIBUTES FILE_ATTRIBUTE_NORMAL
+#define SERIAL_FILE_ATTRIBUTES 0
+
 
 SerialPort::SerialPort(char *portName)
 {
@@ -18,35 +23,30 @@ SerialPort::SerialPort(char *portName)
                                 0,
                                 NULL,
                                 OPEN_EXISTING,
-                                FILE_ATTRIBUTE_NORMAL,
+                                SERIAL_FILE_ATTRIBUTES,
                                 NULL);
     if (this->handler == INVALID_HANDLE_VALUE){
-        if (GetLastError() == ERROR_FILE_NOT_FOUND){
+        if (GetLastError() == ERROR_FILE_NOT_FOUND) {
             printf("ERROR: Handle was not attached. Reason: %s not available\n", portName);
-        }
-    else
-        {
+        } else {
             printf("ERROR!!!\n");
         }
-    }
-    else {
+    } else {
         DCB dcbSerialParameters = {0};
 
         if (!GetCommState(this->handler, &dcbSerialParameters)) {
             printf("failed to get current serial parameters\n");
-        }
-        else {
-            dcbSerialParameters.BaudRate = CBR_9600;
+        } else {
+            // dcbSerialParameters.BaudRate = CBR_9600;
+            dcbSerialParameters.BaudRate = CBR_38400;
             dcbSerialParameters.ByteSize = 8;
             dcbSerialParameters.StopBits = ONESTOPBIT;
             dcbSerialParameters.Parity = NOPARITY;
             dcbSerialParameters.fDtrControl = DTR_CONTROL_ENABLE;
 
-            if (!SetCommState(handler, &dcbSerialParameters))
-            {
+            if (!SetCommState(handler, &dcbSerialParameters)) {
                 printf("ALERT: could not set Serial port parameters\n");
-            }
-            else {
+            } else {
                 this->connected = true;
                 PurgeComm(this->handler, PURGE_RXCLEAR | PURGE_TXCLEAR);
 #if ARDUINO_WAIT_TIME > 0

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "config.h"
+#include "http.c"
 #ifdef SOURCE_TCS34725
 #include "query_color.h"
 #elif defined(SOURCE_SERIAL_SOUND)
@@ -11,27 +12,28 @@
 
 
 
+
+/* returns the received number of colors */
 int create_message(unsigned char *msg, char light_id, uint16_t red, uint16_t green, uint16_t blue){
-
 	// int lights = 1;
-
 	// int message_length = 16 + (lights * 9);
 
+	int rx = 0; // received colors
 	int COLOR_LENGTH = 19; // start of color data
-
-
 
 #ifdef SOURCE_TCS34725
 	if ( colorme(&red, &green, &blue) ){
 		// if colorme returns an error, so should this
-		return 1;
+		return -1;
 	}
 #elif defined( SOURCE_SERIAL_SOUND)
-	if ( serial_receive_colors(&red, &green, &blue) ){
+	rx = serial_receive_colors(&red, &green, &blue);
+	if( rx == 0 ){
 		logm("error in serial_receive_colors");
-		return 1;
 	}
+#ifdef DEBUG
 	printf(" ----> create_message received->Colors:\n\t\n\tRed:\t%" PRIu16 "\n\tGreen:\t%" PRIu16 "\n\tblue:\t%" PRIu16 "\n", red, green, blue);
+#endif
 #else
 		mbedtls_printf("\n  . NO MESSAGE SOURCE WAS DEFINED....\n EXITING...\n\n");
 		exit(1);
@@ -45,12 +47,19 @@ int create_message(unsigned char *msg, char light_id, uint16_t red, uint16_t gre
 	msg[COLOR_LENGTH + 4] = (unsigned char)(blue >> 8);
 	msg[COLOR_LENGTH + 5] = (unsigned char)(blue & 0x00ff);
 
-	return 0;
+	return rx;
 }
 
 int hue_begin_stream(){
+	char data[] = "{\"stream\": {\"active\": true}}";
 	char url[1024];
-	mbedtls_snprintf(url, 1023, "curl -X PUT -H \"Content-Type: application/json\" -d \"{\\\"stream\\\": {\\\"active\\\": true}}\" \"http://%s/api/%s/groups/%s\"", SERVER_ADDR, HUB_USER, ENTERTAINMENT_GROUP);
+	// char *success = "success";
+	mbedtls_snprintf(url, 1023, "/api/%s/groups/%s", HUB_USER, ENTERTAINMENT_GROUP);	
+	http_request(SERVER_ADDR, 80, url, HTTP_PUT, "application/json", (char*)data , sizeof(data));
+
 	mbedtls_printf("\n  . Setting Entertainment mode on the hub for url %s", url);
-	return system(url);
+	if(strstr(url, "success") != NULL) {
+		return true;
+	}
+	return false;
 }

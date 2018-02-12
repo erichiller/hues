@@ -1,14 +1,32 @@
-// Audio Spectrum Display
-// Copyright 2013 Tony DiCola (tony@tonydicola.com)
 
-// This code is part of the guide at http://learn.adafruit.com/fft-fun-with-fourier-transforms/
 
-#define ARM_MATH_CM4
-#include <arm_math.h>
-// #include <Adafruit_NeoPixel.h>
+// int ledPin = 5;
 
-//#define DEBUG
-//#define DEBUG_STARTUP
+// void setup()
+// {
+//     pinMode(ledPin, OUTPUT);
+//     Serial.begin(115200);
+// }
+
+// void loop()
+// {
+//     Serial.println("Hello, world!");
+//     digitalWrite(ledPin, HIGH);
+//     delay(500);
+//     digitalWrite(ledPin, LOW);
+//     delay(500);
+// }
+
+
+
+#include <Wire.h>
+#include <arduinoFFT.h> // Standard Arduino FFT library https://github.com/kosme/arduinoFFT
+
+#define BAUD_RATE 115200
+
+
+#define DEBUG
+#define DEBUG_STARTUP
 #define HUE_DIRECT_FROM_FREQUENCY
 
 
@@ -17,34 +35,52 @@
 // These values can be changed to alter the behavior of the spectrum display.
 ////////////////////////////////////////////////////////////////////////////////
 
-int SAMPLE_RATE_HZ = 9000;             // Sample rate of the audio in hertz.
+int SAMPLE_RATE_HZ    = 9000;          // Sample rate of the audio in hertz.
 float SPECTRUM_MIN_DB = 30.0;          // Audio intensity (in decibels) that maps to low LED brightness.
 float SPECTRUM_MAX_DB = 60.0;          // Audio intensity (in decibels) that maps to high LED brightness.
-int LEDS_ENABLED = 1;                  // Control if the LED's should display the spectrum or not.  1 is true, 0 is false.
+int LEDS_ENABLED      = 1;             // Control if the LED's should display the spectrum or not.  1 is true, 0 is false.
                                        // Useful for turning the LED display on and off with commands from the serial port.
-const int FFT_SIZE = 256;              // Size of the FFT.  Realistically can only be at most 256 
+const int FFT_SIZE    = 256;           // Size of the FFT.  Realistically can only be at most 256 
                                        // without running out of memory for buffers and other state.
-const int AUDIO_INPUT_PIN = 9;         // Input ADC pin for audio data.
+/*
+A0
+A6
+34
+*/
+const int AUDIO_INPUT_PIN = A0;         // Input ADC pin for audio data.
 const int ANALOG_READ_RESOLUTION = 10; // Bits of resolution for the ADC.
 const int ANALOG_READ_AVERAGING = 16;  // Number of samples to average with each ADC reading.
-const int POWER_LED_PIN = 13;          // Output pin for power LED (pin 13 to use Teensy 3.0's onboard LED).
-const int FREQUENCY_BINS = 1;           // Number of neo pixels.  You should be able to increase this without
+// const int POWER_LED_PIN = 13;       // Output pin for power LED (pin 13 to use Teensy 3.0's onboard LED).
+const int FREQUENCY_BINS = A6;          // Number of neo pixels.  You should be able to increase this without
                                        // any other changes to the program.
 const int MAX_CHARS = 65;              // Max size of the input command buffer
 
+arduinoFFT FFT = arduinoFFT();
 
 ////////////////////////////////////////////////////////////////////////////////
 // INTERNAL STATE
 // These shouldn't be modified unless you know what you're doing.
 ////////////////////////////////////////////////////////////////////////////////
 
-IntervalTimer samplingTimer;
-float samples[FFT_SIZE*2];
-float magnitudes[FFT_SIZE];
+// IntervalTimer timer;
+hw_timer_t *timer = NULL;
+//volatile int interruptCounter;        // track interrupt calls to trigger 
+// int totalInterruptCounter;
+volatile SemaphoreHandle_t timerSemaphore;
+portMUX_TYPE timerMux = portMUX_INITIALIZER_UNLOCKED;
+//timer counters
+volatile uint32_t isrCounter = 0;
+volatile uint32_t lastIsrAt = 0;
+
+double samples[FFT_SIZE];
+double imaginary_complex[FFT_SIZE];
+// double samples[FFT_SIZE];
+
 int sampleCounter = 0;
+
 char commandBuffer[MAX_CHARS];
-float frequencyWindow[FREQUENCY_BINS+1];
-float hues[FREQUENCY_BINS];
+double frequencyWindow[FREQUENCY_BINS+1];
+double hues[FREQUENCY_BINS];
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -53,49 +89,95 @@ float hues[FREQUENCY_BINS];
 
 void setup() {
   // Set up serial port.
-  Serial.begin(38400);
-  
+  Serial.begin(BAUD_RATE);
+  timerSemaphore = xSemaphoreCreateBinary();
+
   // Set up ADC and audio input.
   pinMode(AUDIO_INPUT_PIN, INPUT);
   analogReadResolution(ANALOG_READ_RESOLUTION);
-  analogReadAveraging(ANALOG_READ_AVERAGING);
+  // analogReadAveraging(ANALOG_READ_AVERAGING);
   
   // Turn on the power indicator LED.
-  pinMode(POWER_LED_PIN, OUTPUT);
-  digitalWrite(POWER_LED_PIN, HIGH);
+  // pinMode(POWER_LED_PIN, OUTPUT);
+  // digitalWrite(POWER_LED_PIN, HIGH);
   
   // Clear the input command buffer
   memset(commandBuffer, 0, sizeof(commandBuffer));
+
+#ifdef DEBUG_STARTUP
+  Serial.print("amidst setup()");
+#endif
   
   // Initialize spectrum display
   spectrumSetup();
   
   // Begin sampling audio
-  samplingBegin();
+  timerSetup();
 }
+
+
+
+
+
 
 void loop() {
   // Calculate FFT if a full sample is available.
+
+  if (xSemaphoreTake(timerSemaphore, 0) == pdTRUE){
+    uint32_t isrCount = 0, isrTime = 0;
+    // Read the interrupt count and time
+    portENTER_CRITICAL(&timerMux);
+    isrCount = isrCounter;
+    isrTime = lastIsrAt;
+    portEXIT_CRITICAL(&timerMux);
+    // Print it
+    // Serial.print("onTimer no. ");
+    // Serial.print(isrCount);
+    // Serial.print(" at ");
+    // Serial.print(isrTime);
+    // Serial.println(" ms");
+    samplingCallback();
+  }
+
+
+
   if (samplingIsDone()) {
+    sampleCounter = 0;
     // Run FFT on sample data.
-    arm_cfft_radix4_instance_f32 fft_inst;
-    arm_cfft_radix4_init_f32(&fft_inst, FFT_SIZE, 0, 1);
-    arm_cfft_radix4_f32(&fft_inst, samples);
+    // arm_cfft_radix4_instance_f32 fft_inst;
+    // arm_cfft_radix4_init_f32(&fft_inst, FFT_SIZE, 0, 1);
+#ifdef DEBUG
+    Serial.println("FFT.Windowing...");
+#endif
+    FFT.Windowing(samples, FFT_SIZE, FFT_WIN_TYP_HAMMING, FFT_FORWARD);
+    // arm_cfft_radix4_f32(&fft_inst, samples);
+#ifdef DEBUG
+    Serial.println("FFT.Compute...");
+#endif
+    FFT.Compute(samples, imaginary_complex, FFT_SIZE, FFT_FORWARD);
     // Calculate magnitude of complex numbers output by the FFT.
-    arm_cmplx_mag_f32(samples, magnitudes, FFT_SIZE);
+    // arm_cmplx_mag_f32(samples, samples, FFT_SIZE);
+#ifdef DEBUG
+    Serial.println("FFT.ComplexToMagnitude...");
+#endif
+    FFT.ComplexToMagnitude(samples, imaginary_complex, FFT_SIZE);
+#ifdef DEBUG
+    Serial.println("FFT -> DONE");
+#endif
+    
 
 
-    if (LEDS_ENABLED == 1)
-    {
+    if (LEDS_ENABLED == 1){
       spectrumLoop();
     }
   
     // Restart audio sampling.
-    samplingBegin();
+    // samplingBegin();
   }
     
   // Parse any pending commands.
   parserLoop();
+  timerStart(timer);
 }
 
 
@@ -104,7 +186,7 @@ void loop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 // Compute the average magnitude of a target frequency window vs. all other frequencies.
-void windowMean(float* magnitudes, int lowBin, int highBin, float* windowMean, float* otherMean, int *windowMax) {
+void windowMean(double* samples, int lowBin, int highBin, float* windowMean, float* otherMean, int *windowMax) {
     *windowMean = 0;
     *otherMean = 0;
     *windowMax = 1;
@@ -112,12 +194,12 @@ void windowMean(float* magnitudes, int lowBin, int highBin, float* windowMean, f
     // average power of the signal.
     for (int i = 1; i < FFT_SIZE/2; ++i) {
       if (i >= lowBin && i <= highBin) {
-        *windowMean += magnitudes[i];
+        *windowMean += samples[i];
       }
       else {
-        *otherMean += magnitudes[i];
+        *otherMean += samples[i];
       }
-      if(magnitudes[i] > magnitudes[*windowMax]){
+      if(samples[i] > samples[*windowMax]){
         *windowMax=i;
       }
     }
@@ -218,7 +300,7 @@ void spectrumLoop() {
 
   for (int i = 0; i < FREQUENCY_BINS; ++i) {
     
-    windowMean(magnitudes, 
+    windowMean(samples, 
                frequencyToBin(frequencyWindow[i]),
                frequencyToBin(frequencyWindow[i+1]),
                &intensity,
@@ -254,26 +336,25 @@ void spectrumLoop() {
 ////////////////////////////////////////////////////////////////////////////////
 
 void samplingCallback() {
+// #ifdef DEBUG
+//   Serial.println("samplingCallback()");
+// #endif
   // Read from the ADC and store the sample data
-  samples[sampleCounter] = (float32_t)analogRead(AUDIO_INPUT_PIN);
-  // Complex FFT functions require a coefficient for the imaginary part of the input.
-  // Since we only have real data, set this coefficient to zero.
-  samples[sampleCounter+1] = 0.0;
+  samples[sampleCounter] = analogRead(AUDIO_INPUT_PIN);
+  Serial.println(samples[sampleCounter], DEC);
+
+  imaginary_complex[sampleCounter] = 0.0;
+  // samples[sampleCounter+1] = 0.0;
   // Update sample buffer position and stop after the buffer is filled
-  sampleCounter += 2;
-  if (sampleCounter >= FFT_SIZE*2) {
-    samplingTimer.end();
+  sampleCounter++;
+  if (sampleCounter >= FFT_SIZE) {
+    // timer.end();
+    timerStop(timer);
   }
 }
 
-void samplingBegin() {
-  // Reset sample buffer position and start callback at necessary rate.
-  sampleCounter = 0;
-  samplingTimer.begin(samplingCallback, 1000000/SAMPLE_RATE_HZ);
-}
-
 boolean samplingIsDone() {
-  return sampleCounter >= FFT_SIZE*2;
+  return sampleCounter >= FFT_SIZE;
 }
 
 
@@ -327,9 +408,9 @@ void parseCommand(char* command) {
   Serial.println(command);
 #endif
   
-  if (strcmp(command, "GET MAGNITUDES") == 0) {
+  if (strcmp(command, "GET samples") == 0) {
     for (int i = 0; i < FFT_SIZE; ++i) {
-      Serial.println(magnitudes[i]);
+      Serial.println(samples[i]);
     }
   }
   else if (strcmp(command, "GET SAMPLES") == 0) {
@@ -340,6 +421,14 @@ void parseCommand(char* command) {
   else if (strcmp(command, "GET FFT_SIZE") == 0) {
     Serial.println(FFT_SIZE);
   }
+  else if (strcmp(command, "PAUSE") == 0) {
+    timerStop(timer);
+    Serial.println("timer stopped.");
+  }
+  else if (strcmp(command, "RESUME") == 0) {
+    timerStart(timer);
+    Serial.println("timer resumed.");
+  }
   GET_AND_SET(SAMPLE_RATE_HZ)
   GET_AND_SET(LEDS_ENABLED)
   GET_AND_SET(SPECTRUM_MIN_DB)
@@ -349,4 +438,38 @@ void parseCommand(char* command) {
   if (strstr(command, "SET SAMPLE_RATE_HZ ") != NULL) {
     spectrumSetup();
   }
+}
+
+
+////////////////////////////////////////
+// Timer Management
+////////////////////////////////////////
+
+
+
+void IRAM_ATTR timerCall(){
+  // Increment the counter and set the time of ISR
+  portENTER_CRITICAL_ISR(&timerMux);
+  isrCounter++;
+  lastIsrAt = millis();
+  portEXIT_CRITICAL_ISR(&timerMux);
+  // Give a semaphore that we can check in the loop
+  xSemaphoreGiveFromISR(timerSemaphore, NULL);
+  // It is safe to use digitalRead/Write here if you want to toggle an output
+}
+
+
+void timerSetup() {
+#ifdef DEBUG
+  Serial.println("timerSetup()");
+#endif
+  timer = timerBegin(0, 80, true);                      // divide by 80, gives us 1,000,000/s
+  // third value in timerAttachInterrupt is edge/level triggering
+  // see https://electronics.stackexchange.com/questions/21886/what-does-edge-triggered-and-level-triggered-mean
+  timerAttachInterrupt(timer, &timerCall, true); //attach callback
+  // Set alarm to call onTimer function every second / SAMPLE_RATE_HZ ;; Thus, 10 kHz would be ever .1ms
+  // Repeat the alarm is the third parameter
+  timerAlarmWrite(timer, 1000000/SAMPLE_RATE_HZ, true);
+  // Start an alarm
+  timerAlarmEnable(timer);
 }

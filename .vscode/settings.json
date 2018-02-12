@@ -11,7 +11,8 @@
 		"xiosbase": "cpp",
 		"xstring": "cpp",
 		"ostream": "cpp",
-		"iostream": "cpp"
+		"iostream": "cpp",
+		"xlocale": "cpp"
 	},
 	"C_Cpp.clang_format_style": "llvm",
 	"C_Cpp.formatting": "Default"

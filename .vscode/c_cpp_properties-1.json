@@ -1,0 +1,63 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/include/*",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/um",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/ucrt",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/shared",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/winrt",
+                "${workspaceRoot}",
+                "${workspaceRoot}/wiringPi",
+                "${workspaceRoot}/mbedtls",
+                "${workspaceRoot}/Adafruit_TCS34725",
+                "${workspaceRoot}/../../../arduino/libraries/arduinoFFT/src",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries/Wire/src",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/cores/esp32",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/config",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/log",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/esp32",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/esp32/rom",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/soc",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/driver",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/freertos",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/heap",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+                "C:\\Program Files (x86)\\Arduino",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32\\variants\\doitESP32devkitV1",
+                
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0/tr1",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include"
+                
+                
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "ARDUINO=100"
+            ],
+            "intelliSenseMode": "msvc-x64",
+            "browse": {
+                "path": [
+                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/include/*",
+                    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/um",
+                    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/ucrt",
+                    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/shared",
+                    "C:/Program Files (x86)/Windows Kits/10/Include/10.0.14393.0/winrt",
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/../../../arduino",
+                    "C:\\Program Files (x86)\\Arduino"
+                    
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 3
+}

@@ -1,0 +1,58 @@
+
+AlignAfterOpenBracket: BAS_Align 
+
+AlignConsecutiveAssignments: true 
+
+AlignConsecutiveDeclarations: true 
+
+AlignOperands: true 
+
+AlignTrailingComments: true 
+
+AllowAllParametersOfDeclarationOnNextLine: true 
+
+AllowShortBlocksOnASingleLine: true 
+
+AllowShortCaseLabelsOnASingleLine: false 
+
+AllowShortFunctionsOnASingleLine: SFS_Empty 
+
+AllowShortIfStatementsOnASingleLine true 
+
+AllowShortLoopsOnASingleLine false 
+
+AlwaysBreakAfterDefinitionReturnType DRTBS_None 
+
+AlwaysBreakAfterReturnType RTBS_None 
+
+AlwaysBreakBeforeMultilineStrings false 
+
+AlwaysBreakTemplateDeclarations false 
+
+BinPackArguments false 
+
+BinPackParameters false 
+
+BreakBeforeBraces BS_WebKit 
+
+BreakBeforeBinaryOperators BOS_None 
+
+BreakBeforeTernaryOperators true 
+
+ColumnLimit 0 
+
+CompactNamespaces false 
+
+//I'd rather have one parameter per line 
+ConstructorInitializerAllOnOneLineOrOnePerLine true 
+
+ConstructorInitializerIndentWidth 4 
+
+ContinuationIndentWidth 4 
+
+// may or may not work 
+ExperimentalAutoDetectBinPacking true 
+
+FixNamespaceComments true 
+
+IncludeBlocks IBS_Regroup 

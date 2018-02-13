@@ -7,7 +7,7 @@
                 "${workspaceRoot}/board",
                 "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
                 "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/atlmfc/include/*",
-                
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/variants/doitESP32devkitV1",
                 "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0/tr1",
                 "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0",
                 "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf",
@@ -23,8 +23,7 @@
                 "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/driver",
                 "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/freertos",
                 "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/heap",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32\\variants\\doitESP32devkitV1"
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include"
                 
                 
             ],

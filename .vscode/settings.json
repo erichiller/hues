@@ -12,8 +12,14 @@
 		"xstring": "cpp",
 		"ostream": "cpp",
 		"iostream": "cpp",
-		"xlocale": "cpp"
+		"xlocale": "cpp",
+		"net_sockets.h": "c",
+		"hue.h": "c",
+		"config.h": "c"
 	},
-	"C_Cpp.clang_format_style": "llvm",
-	"C_Cpp.formatting": "Default"
+	"C_Cpp.clang_format_style": "WebKit",
+	"C_Cpp.formatting": "Default",
+	"C_Cpp.intelliSenseEngineFallback": "Enabled",
+	"editor.useTabStops": true,
+	"editor.tabSize": 4
 }

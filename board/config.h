@@ -2,10 +2,9 @@
 #define CONFIG
 #include "upstream.h"
 
-/* TCS34725 */
-#define RASPBERRY_PI_2
-#define RASPBERRY_PI
-#define LOG_LEVEL 2
+/* ESP32 */
+#define BAUD_RATE 115200
+
 
 #define logm(message) \
 	printf("\nLOG:\t (src) %s : %i ----\n", __FILE__, __LINE__); \
@@ -17,7 +16,7 @@
 //  ONLY __1__ CAN BE ACTIVE!  //
 /////////////////////////////////
 // #define SOURCE_TCS34725
-#define SOURCE_SERIAL_SOUND
+#define SOURCE_LOCAL_MIC
 
 /* hue stream , mbedtls */
 
@@ -45,6 +44,9 @@
 
 // #define ENABLE_GAMMATABLE /* enabling gammatable will attempt to adjust for how the human eye sees **/
 
+
+/* wifi max wait time (miliseconds) */
+#define WIFI_MAX_WAIT 30000
 
 
 

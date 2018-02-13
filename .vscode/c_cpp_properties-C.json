@@ -1,0 +1,55 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceRoot}",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/variants/doitESP32devkitV1",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries",
+
+                
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0/tr1",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0/xtensa-esp32-elf",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries/Wire/src",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries/WiFi/src",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/tcpip_adapter",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/cores/esp32",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/vfs",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/lwip",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/config",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/log",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/esp32",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/esp32/rom",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/soc",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/driver",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/freertos",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include/heap",
+                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+                "${workspaceRoot}/../../../arduino/libraries/arduinoFFT/src",
+                "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10586.0/*/*"
+                
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "ARDUINO=100",
+                "USBCON"
+            ],
+            "intelliSenseMode": "msvc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/variants/doitESP32devkitV1",
+                    "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries",
+                    "${workspaceRoot}/../../../arduino/libraries/"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 3
+}

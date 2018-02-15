@@ -17,9 +17,12 @@
 		"hue.h": "c",
 		"config.h": "c"
 	},
-	"C_Cpp.clang_format_style": "WebKit",
 	"C_Cpp.formatting": "Default",
 	"C_Cpp.intelliSenseEngineFallback": "Enabled",
 	"editor.useTabStops": true,
-	"editor.tabSize": 4
+	"editor.tabSize": 4,
+	"C_Cpp.clang_format_fallbackStyle": "WebKit",
+	"C_Cpp.clang_format_path": "C:/Users/ehiller/AppData/Local/omega/bin/clang-format.exe",
+	"C_Cpp.clang_format_style": "file"
+	
 }

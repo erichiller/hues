@@ -1,7 +1,6 @@
 
 
 #ifndef HUE_H
-
 #define HUE_H
 
 #include <stdio.h>

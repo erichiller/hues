@@ -1,3 +1,6 @@
+#ifndef UPSTREAM_H
+#define UPSTREAM_H
+
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
 #else
@@ -13,3 +16,4 @@
 #define mbedtls_fprintf    fprintf
 #endif
 
+#endif

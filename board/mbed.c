@@ -1,7 +1,6 @@
 /*
  *  Hue DTLS adopted from mbed simples DTLS client
  **/
-
 #include <unistd.h>
 
 #include "config.h"
@@ -33,6 +32,7 @@ int main(void)
 
 /* Last order of business: CHECK CONFIG VALIDITY! */
 #include "mbedtls/check_config.h"
+
 
 unsigned int loop_last, loop_now = 0;
 mbedtls_timing_hr_time timer;
@@ -425,6 +425,8 @@ exit:
 
     return (ret);
 }
+
+
 #endif /* MBEDTLS_SSL_CLI_C && MBEDTLS_SSL_PROTO_DTLS && MBEDTLS_NET_C && \
 MBEDTLD_TIMING_C && MBEDTLS_ENTROPY_C && MBEDTLS_CTR_DRBG_C &&            \
 MBEDTLS_X509_CRT_PARSE_C && MBEDTLS_RSA_C && MBEDTLS_CERTS_C &&           \

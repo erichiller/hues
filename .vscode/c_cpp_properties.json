@@ -4,29 +4,32 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceRoot}",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/variants/doitESP32devkitV1",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries",
-
-                
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/include/c++/5.2.0",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/cores/esp32",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/sdk/include",
-                "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/tools/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include"
+                "${workspaceRoot}/build/include",
+                "${workspaceRoot}/main",
+                "${workspaceRoot}/main/include",
+                "${workspaceRoot}/build/include/config",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/usr/lib/gcc/i686-pc-msys/6.4.0/include",
+                "C:/Users/ehiller/AppData/local/Omega/system/msys/opt/esp-idf/components/driver/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/esp32/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/soc/esp32/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/newlib/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/newlib/include/sys",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/mbedtls/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/freertos/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/heap/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/soc/include"
                 
             ],
             "defines": [
-                "_DEBUG",
-                "UNICODE",
-                "ARDUINO=100",
-                "USBCON"
             ],
             "intelliSenseMode": "msvc-x64",
             "browse": {
                 "path": [
                     "${workspaceRoot}",
-                    "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/variants/doitESP32devkitV1",
-                    "${workspaceRoot}/../../../arduino/hardware/espressif/esp32/libraries"
+                    "${workspaceRoot}/main",
+                    "${workspaceRoot}/build/include/config",
+                    "C:/Users/ehiller/AppData/local/Omega/system/msys/opt/esp-idf/components",
+                    "C:/Users/ehiller/AppData/Local/omega/system/msys/usr/lib/gcc/i686-pc-msys/6.4.0/include"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

@@ -1,6 +1,9 @@
 #ifndef CONFIG
 #define CONFIG
 
+#include "esp_log.h"
+#include "driver/timer.h"
+
 /* ESP32 */
 #define BAUD_RATE 115200
 
@@ -10,17 +13,34 @@
 	printf("LOG:\t(msg) %s\n", message);
 
 #ifdef DEBUG
-#define debug(message) \
+#define debug(message, ...) \
 	printf("\nLOG:\t (src) "); \
 	printf(__FILE__); \
 	printf(" : "); \
 	printf(__LINE__); \
 	println("----"); \
-	printf("LOG:\t(msg) ");
-	println(message);
+	printf("LOG:\t(msg) "); \
+	printf(message, __VA_ARGS__); \
+	printf("\n");
 #else
-	#define debug(message) 
+	#define debug(message, ...) 
 #endif
+
+/*
+ ***************************************
+ * LOGGING
+ * 
+ * LOG_TAG_* must be unique
+ **************************************
+ */
+#define LOG_DEFAULT_LEVEL ESP_LOG_DEBUG
+#define LOG_TAG_WIFI "WiFi"
+#define LOG_TAG_WIFI_LEVEL ESP_LOG_VERBOSE
+#define LOG_TAG_MAIN "Main"
+#define LOG_TAG_MAIN_LEVEL ESP_LOG_DEBUG
+#define LOG_TAG_SPECTRUM "Spectrum"
+#define LOG_TAG_SPECTRUM_LEVEL ESP_LOG_VERBOSE
+
 
 
 /////////////////////////////////
@@ -72,17 +92,11 @@
 /* wifi max wait time (miliseconds) */
 #define WIFI_MAX_WAIT 30000
 
-
-
-/* SerialPort */
-
-#define ARDUINO_WAIT_TIME 0
-// #define MAX_DATA_LENGTH 255
-#define MAX_DATA_LENGTH 64
-
-// #define SERIAL_PORT_SLEEP 1000
-#define SERIAL_PORT_SLEEP 500
-
+/**
+ *  timer 
+ **/
+#define TIMER_HZ_GROUP TIMER_GROUP_0
+#define TIMER_HZ_IDX TIMER_0
 
 // void logm(const char* file, const char* line, const char* func, char const * str){
 // 	printf("LOG ---- %s : %s , %s ----", file, line, func);
@@ -90,22 +104,8 @@
 // } 
 
 /* replacement for println */
-
-#ifdef ARDUINO
-#define println(message) \
-	println(message);
-#else
 #define println(message) \
 	printf("%s\n", message);
-#endif
-
-
-/** POST CONFIG PROCESSING 
- * DO NOT EDIT BENEATH HERE**/
-#if DEBUG_LEVEL > 0
-#pragma message("NOTE ---> DEBUG MESSAGES ENABLED")
-#define DEBUG
-#endif
 
 #endif
 
@@ -114,5 +114,3 @@
  this is a cool _hot pink_
  aa ff 12 34 56 78
  */
-
-#include "upstream.h"

@@ -1,0 +1,42 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceRoot}",
+                "${workspaceRoot}/main",
+                "${workspaceRoot}/main/include",
+                "${workspaceRoot}/build/include/",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/usr/lib/gcc/i686-pc-msys/6.4.0/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/newlib/include",
+                "C:/Users/ehiller/AppData/local/Omega/system/msys/opt/esp-idf/components/driver/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/esp32/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/soc/esp32/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/mbedtls/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/freertos/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/heap/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/soc/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/lwip/include/lwip",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/lwip/include/lwip/lwip",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/lwip/include/lwip/port",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/vfs/include",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components/vfs/include"                
+            ],
+            "defines": [
+            ],
+            "intelliSenseMode": "msvc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}",
+                    "${workspaceRoot}/main",
+                    "${workspaceRoot}/build/include/config",
+                    "C:/Users/ehiller/AppData/local/Omega/system/msys/opt/esp-idf/components",
+                    "C:/Users/ehiller/AppData/Local/omega/system/msys/usr/lib/gcc/i686-pc-msys/6.4.0/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 3
+}

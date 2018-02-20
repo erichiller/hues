@@ -47,16 +47,16 @@ BinPackArguments: false
 BinPackParameters: false
 
 # only if BreakBeforeBraces is set to Custom
-# BraceWrapping:
+BraceWrapping:
 #   AfterClass:      false
 #   AfterControlStatement: false
 #   AfterEnum:       false
 #   AfterFunction:   true
 #   AfterNamespace:  false
 #   AfterObjCDeclaration: false
-#   AfterStruct:     false
-#   AfterUnion:      false
-#   AfterExternBlock: false
+  AfterStruct:     true
+  AfterUnion:      true
+  # AfterExternBlock: false
 #   BeforeCatch:     false
 #   BeforeElse:      false
 #   IndentBraces:    false
@@ -141,7 +141,7 @@ SpaceBeforeParens: Never
 SpaceInEmptyParentheses: true
 
 
-SpacesBeforeTrailingComments: 1
+SpacesBeforeTrailingComments: 4
 
 SpacesInAngles: false
 

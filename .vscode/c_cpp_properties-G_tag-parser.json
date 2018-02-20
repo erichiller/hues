@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceRoot}",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/opt/esp-idf/components",
+                "C:/Users/ehiller/AppData/Local/omega/system/msys/usr/lib/gcc/i686-pc-msys/6.4.0/include"
+            ],
+            "defines": [
+            ],
+            "intelliSenseMode": "msvc-x64",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}",
+                    "C:/Users/ehiller/AppData/local/Omega/system/msys/opt/esp-idf/components",
+                    "C:/Users/ehiller/AppData/Local/omega/system/msys/usr/lib/gcc/i686-pc-msys/6.4.0/include"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 3
+}

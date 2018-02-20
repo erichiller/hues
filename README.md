@@ -1,5 +1,8 @@
 # project notes
 
+## VSCode include paths
+
+<https://github.com/Microsoft/vscode-cpptools/issues/1561>
 
 ## Compilation
 

@@ -3,6 +3,7 @@
 		"*.txt": "markdown",
 		"*_vimrc": "viml",
 		"CMakeLists.txt": "cmake",
+		".clang-format": "yaml",
 		"initializer_list": "cpp",
 		"xutility": "cpp",
 		"istream": "cpp",
@@ -15,14 +16,20 @@
 		"xlocale": "cpp",
 		"net_sockets.h": "c",
 		"hue.h": "c",
-		"config.h": "c"
+		"config.h": "c",
+		"http.h": "c",
+		"string.h": "c",
+		"stdio.h": "c",
+		"types.h": "c"
 	},
 	"C_Cpp.formatting": "Default",
 	"C_Cpp.intelliSenseEngineFallback": "Enabled",
 	"editor.useTabStops": true,
 	"editor.tabSize": 4,
+	"editor.detectIndentation": false,
 	"C_Cpp.clang_format_fallbackStyle": "WebKit",
 	"C_Cpp.clang_format_path": "C:/Users/ehiller/AppData/Local/omega/bin/clang-format.exe",
-	"C_Cpp.clang_format_style": "file"
-	
+	"C_Cpp.clang_format_style": "file",
+	// "C_Cpp.intelliSenseEngine": "Tag Parser",
+	"C_Cpp.loggingLevel": "Information"
 }

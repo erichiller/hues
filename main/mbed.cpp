@@ -10,6 +10,22 @@
 
 #include "hue.h"
 
+
+#if !defined( MBEDTLS_CONFIG_FILE )
+#	include "mbedtls/config.h"
+#else
+// #	pragma message "Using config from preprocessor macro MBEDTLS_CONFIG_FILE -> " MBEDTLS_CONFIG_FILE
+// #	include MBEDTLS_CONFIG_FILE
+#endif
+
+#if defined( MBEDTLS_PLATFORM_C )
+#	include "mbedtls/platform.h"
+#else
+#	include <stdio.h>
+#	define mbedtls_printf printf
+#	define mbedtls_fprintf fprintf
+#endif
+
 #if !defined( MBEDTLS_SSL_CLI_C )
 #	pragma message( "!! ERROR !! not defined: MBEDTLS_SSL_CLI_C " )
 #	define MBED_MISSING_DEFINE
@@ -69,19 +85,21 @@
 #	include "mbedtls/certs.h"
 #	include "mbedtls/timing.h"
 
-/* Last order of business: CHECK CONFIG VALIDITY! */
+	/* Last order of business: CHECK CONFIG VALIDITY! */
 #	include "mbedtls/check_config.h"
 
 
 unsigned int		   loop_last, loop_now = 0;
 mbedtls_timing_hr_time mbed_timer;
 
-struct counter_diff {
+struct counter_diff
+{
 	unsigned int now  = 0;
 	unsigned int last = 0;
 };
 
-struct color_counters {
+struct color_counters
+{
 	counter_diff serial_rx;
 	counter_diff hue_tx;
 } counter;
@@ -91,24 +109,24 @@ int hue_mbed_tx( mbedtls_ssl_context *ssl ) {
 	int			  ret, len, rx;
 
 	unsigned char message_template[] = {
-		'H', 'u', 'e', 'S', 't', 'r', 'e', 'a', 'm', // protocol (9)
+		'H', 'u', 'e', 'S', 't', 'r', 'e', 'a', 'm',	// protocol (9)
 		0x01,
-		0x00, // version 1.0 (2)
-		0x01, // sequence number 1 (not observed) (1)
+		0x00,	// version 1.0 (2)
+		0x01,	// sequence number 1 (not observed) (1)
 		0x00,
-		0x00, // reserved (2)
-		0x00, // color mode RGB (1)
-		0x00, // reserved (1)
+		0x00,	// reserved (2)
+		0x00,	// color mode RGB (1)
+		0x00,	// reserved (1)
 		//// light command #1 (up to 10)
 		0x00,
 		0x00,
-		0x0d, // light 13
+		0x0d,	// light 13
 		0x00,
 		0x00,
 		0x00,
 		0x00,
 		0x00,
-		0x00 // color
+		0x00	// color
 	};
 	unsigned char *message = (unsigned char *)&message_template;
 	while( 1 ) {
@@ -459,7 +477,4 @@ exit:
 }
 
 
-#endif /* MBEDTLS_SSL_CLI_C && MBEDTLS_SSL_PROTO_DTLS && MBEDTLS_NET_C && \
-MBEDTLD_TIMING_C && MBEDTLS_ENTROPY_C && MBEDTLS_CTR_DRBG_C &&            \
-MBEDTLS_X509_CRT_PARSE_C && MBEDTLS_RSA_C && MBEDTLS_CERTS_C &&           \
-MBEDTLS_PEM_PARSE_C */
+#endif

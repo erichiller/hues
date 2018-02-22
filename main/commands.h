@@ -16,12 +16,15 @@
 #ifndef COMMANDS_H
 #define COMMANDS_H
 
+#define LOGT "Commands"
+
 #include "ctype.h"
-#include "globals.h"
+#include "time_intr.h"
 #include "config.h"
 #include "mbed.h"
 #include "net_wifi.h"
 #include "spectrum.h"
+#include "esp_log.h"
 
 // #include "esp_console.h"
 // #include "esp_vfs_dev.h"
@@ -84,7 +87,7 @@ int command_hue_start( void ) {
 	}
 
 void parseCommand( char *command ) {
-	debug( "Command received: %s\n", command );
+	ESP_LOGD(LOGT, "Command received: %s\n", command );
 
 	if( strcmp( command, "GET SAMPLES" ) == 0 ) {
 		for( int i = 0; i < FFT_SIZE; ++i ) {
@@ -109,10 +112,6 @@ void parseCommand( char *command ) {
 		printf( "SAMPLE_RATE_HZ=%i", SAMPLE_RATE_HZ );
 	}
 	SET( SAMPLE_RATE_HZ )
-	else if( strcmp( command, "GET LEDS_ENABLED" ) == 0 ) {
-		printf( "LEDS_ENABLED=%i", LEDS_ENABLED );
-	}
-	SET( LEDS_ENABLED )
 	else if( strcmp( command, "GET SPECTRUM_MIN_DB" ) == 0 ) {
 		printf( "SPECTRUM_MIN_DB=%f", SPECTRUM_MIN_DB );
 	}
@@ -146,5 +145,7 @@ void parserLoop( ) {
 	// 	}
 	// }
 }
+
+#undef LOGT
 
 #endif

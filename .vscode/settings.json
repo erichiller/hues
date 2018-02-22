@@ -20,7 +20,9 @@
 		"http.h": "c",
 		"string.h": "c",
 		"stdio.h": "c",
-		"types.h": "c"
+		"types.h": "c",
+		"mbed.h": "c",
+		"timing.h": "c"
 	},
 	"C_Cpp.formatting": "Default",
 	"C_Cpp.intelliSenseEngineFallback": "Enabled",

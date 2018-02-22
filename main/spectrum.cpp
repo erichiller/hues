@@ -1,4 +1,3 @@
-#include "globals.h"
 #include "config.h"
 #include "spectrum.h"
 // #include "gpio.h"
@@ -6,6 +5,12 @@
 #include "esp_log.h"
 
 #define LOGT LOG_TAG_SPECTRUM
+
+
+/***
+ * converts inputs of noise to ouputs of colors of size FREQUENCY BINS
+ * (samplingCallback)--samples[FFT_SIZE]--> (spectrumLoop)--outcolors[FREQUENCY_BINS]
+ **/
 
 
 /******
@@ -16,19 +21,16 @@
 int   SAMPLE_RATE_HZ  = 9000;	// Sample rate of the audio in hertz.
 float SPECTRUM_MIN_DB = 30.0;	// Audio intensity (in decibels) that maps to low LED brightness.
 float SPECTRUM_MAX_DB = 60.0;	// Audio intensity (in decibels) that maps to high LED brightness.
-int   LEDS_ENABLED	= 1;		 // Control if the LED's should display the spectrum or not.  1 is true, 0 is false.
-								 // Useful for turning the LED display on and off with commands from the serial port.
 
 const int FFT_SIZE = 256;	// Size of the FFT.  Realistically can only be at most 256
 							 // without running out of memory for buffers and other state.
 
 const adc1_channel_t   AUDIO_INPUT_PIN		  = ADC1_GPIO34_CHANNEL;	// Input ADC pin for audio data. See board specfic pins header file. **A6**
-const adc_bits_width_t ANALOG_READ_RESOLUTION = ADC_WIDTH_BIT_10;		// Bits of resolution for the ADC.
-const int			   ANALOG_ATTENUATION	 = ADC_ATTEN_DB_0;
+const adc_bits_width_t ANALOG_READ_RESOLUTION = ADC_WIDTH_BIT_12;		// Bits of resolution for the ADC.
+adc_atten_t			   ANALOG_ATTENUATION	  = ADC_ATTEN_DB_11;
 const int			   ANALOG_READ_AVERAGING  = 16;	// Number of samples to average with each ADC reading.
-// const int POWER_LED_PIN = 13;       // Output pin for power LED (pin 13 to use Teensy 3.0's onboard LED).
-const int FREQUENCY_BINS = 1;	// Number of neo pixels.  You should be able to increase this without
-								 // any other changes to the program.
+const int			   FREQUENCY_BINS		  = 1;	 // Number of neo pixels.  You should be able to increase this without
+													   // any other changes to the program.
 
 int sampleCounter = 0;
 
@@ -42,8 +44,10 @@ arduinoFFT FFT = arduinoFFT( );
 
 double imaginary_complex[FFT_SIZE];
 
+color16_t outcolors[FREQUENCY_BINS];
 
-void log_spectrum_init(){
+
+void log_spectrum_init( ) {
 	esp_log_level_set( LOG_TAG_SPECTRUM, LOG_TAG_SPECTRUM_LEVEL );
 }
 
@@ -57,12 +61,9 @@ void spectrumSetup( ) {
 	// Evenly spread hues across all pixels.
 	for( int i = 0; i < FREQUENCY_BINS; ++i ) {
 		hues[i] = 360.0 * ( float( i ) / float( FREQUENCY_BINS - 1 ) );
-#ifdef DEBUG_STARTUP
-		printf( "**** DEBUG_STARTUP **** hues[%i]=%d", i, hues[i] );
-#endif
+		ESP_LOGD( LOGT, "**** DEBUG_STARTUP **** hues[%i]=%f", i, hues[i] );
 	}
-	debug( "**** DEBUG_STARTUP **** \\end// hues[0]=" );
-	debug( hues[0] );
+	ESP_LOGD( LOGT, "**** DEBUG_STARTUP **** \\end// hues[0]=%f", hues[0] );
 }
 
 
@@ -104,7 +105,7 @@ int frequencyToBin( float frequency ) {
 
 // Convert from HSV values (in floating point 0 to 1.0) to RGB colors usable
 // by neo pixel functions.
-uint64_t pixelHSVtoRGBColor( float hue, float saturation, float value ) {
+color16_t pixelHSVtoRGBColor( float hue, float saturation, float value ) {
 	// Implemented from algorithm at http://en.wikipedia.org/wiki/HSL_and_HSV#From_HSV
 	float chroma = value * saturation;
 	float h1	 = float( hue ) / 60.0;
@@ -136,19 +137,21 @@ uint64_t pixelHSVtoRGBColor( float hue, float saturation, float value ) {
 	r += m;
 	g += m;
 	b += m;
-#ifdef DEBUG
-	printf( "\tFREQUENCY_BINS=%i\n", FREQUENCY_BINS );
-	printf( "\tHue=%f\n", hue );
-	printf( "\tSaturation=%f\n", saturation );
-	printf( "\tLuminosity=%f\n", value );
-	printf( "\tred  =%f\tx255=%f\thex=%04X\n", r, ( r * 255 ), int( 255 * r ) );
-	printf( "\tgreen=%f\tx255=%f\thex=%04X\n", g, ( g * 255 ), int( 255 * g ) );
-	printf( "\tblue =%f\tx255=%f\thex=%04X\n", b, ( b * 255 ), int( 255 * b ) );
-#endif
-	return (
-		( uint16_t( 0xFFFF * r ) << 32 ) +
-		( ( uint16_t( 0xFFFF * g ) ) << 16 ) +
-		uint16_t( 0xFFFF * b ) );
+	ESP_LOGD( LOGT, "\tFREQUENCY_BINS=%i\n", FREQUENCY_BINS );
+	ESP_LOGD( LOGT, "\tHue=%f\n", hue );
+	ESP_LOGD( LOGT, "\tSaturation=%f\n", saturation );
+	ESP_LOGD( LOGT, "\tLuminosity=%f\n", value );
+	ESP_LOGD( LOGT, "\tred  =%f\tx255=%f\thex=%04X\n", r, ( r * 255 ), int( 255 * r ) );
+	ESP_LOGD( LOGT, "\tgreen=%f\tx255=%f\thex=%04X\n", g, ( g * 255 ), int( 255 * g ) );
+	ESP_LOGD( LOGT, "\tblue =%f\tx255=%f\thex=%04X\n", b, ( b * 255 ), int( 255 * b ) );
+	// return ( ( uint64_t )( uint16_t( 0xFFFF * r ) << 32 ) +
+	// 		 ( ( uint16_t( 0xFFFF * g ) ) << 16 ) +
+	// 		 uint16_t( 0xFFFF * b ) );
+	return ( color16_t ){
+		.red   = ( uint16_t )( 0xFFFF * r ),
+		.green = ( uint16_t )( 0xFFFF * b ),
+		.blue  = ( uint16_t )( 0xFFFF * g ),
+	};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -179,12 +182,12 @@ void spectrumLoop( ) {
 //    printf(pixelHSVtoRGBColor(hues[i], 1.0, intensity), HEX);
 #ifdef HUE_DIRECT_FROM_FREQUENCY
 		float hue = ( float( windowMax ) / ( FFT_SIZE / 2.0 ) ) * 360.0;
-		ESP_LOGV(LOGT, "**** HUE_DIRECT_FROM_FREQUENCY **** {windowMax=%f} {FFT_SIZE=%i} {hue=%f} {intensity=%f} ****", windowMax, FFT_SIZE, hue, intensity );
+		ESP_LOGV( LOGT, "**** HUE_DIRECT_FROM_FREQUENCY **** {windowMax=%i} {FFT_SIZE=%i} {hue=%f} {intensity=%f} ****", windowMax, FFT_SIZE, hue, intensity );
 #else
 		float hue = hues[i];
-		ESP_LOGV(LOGT, "**** [i=%i] {hue=%f} {intensity=%f} ****", i, hue, intensity );
+		ESP_LOGV( LOGT, "**** [i=%i] {hue=%f} {intensity=%f} ****", i, hue, intensity );
 #endif
-		pixelHSVtoRGBColor( hue, 1.0, intensity );
+		outcolors[i] = pixelHSVtoRGBColor( hue, 1.0, intensity );
 	}
 }
 
@@ -192,7 +195,7 @@ void spectrumLoop( ) {
 // SAMPLING FUNCTIONS
 ////////////////////////////////////////////////////////////////////////////////
 
-void samplingCallback( ) {
+int samplingCallback( ) {
 	// #ifdef DEBUG
 	//   println("samplingCallback()");
 	// #endif
@@ -206,10 +209,11 @@ void samplingCallback( ) {
 	// Update sample buffer position and stop after the buffer is filled
 	sampleCounter++;
 	if( sampleCounter >= FFT_SIZE ) {
-		ESP_LOGV(LOGT, "**** sampleCounter{%i} has exceeded FFT_SIZE{%i}, timer_pauseing ****", sampleCounter, FFT_SIZE );		
+		ESP_LOGV( LOGT, "**** sampleCounter{%i} has exceeded FFT_SIZE{%i}, timer_pausing ****", sampleCounter, FFT_SIZE );
 		// timer.end();
-		timer_pause( TIMER_GROUP_0, TIMER_0 );
+		// timer_pause( TIMER_GROUP_0, TIMER_0 );
 	}
+	return sampleCounter - 1;
 }
 
 bool samplingIsDone( ) {

@@ -1,14 +1,23 @@
 /*
  *  Hue DTLS adopted from mbed simples DTLS client
  **/
+
+
+#define MBEDTLS_NET_C
+#define MBEDTLS_TIMING_C
+
 #include <unistd.h>
 
 #include "config.h"
 #include <stdint.h>
 #include <string.h>
 #include "mbedtls/ssl.h"
+#include "esp_log.h"
+#include "sys/time.h"
 
 #include "hue.h"
+
+#define LOGT "MBEDeh"
 
 
 #if !defined( MBEDTLS_CONFIG_FILE )
@@ -34,14 +43,14 @@
 #	pragma message( "!! ERROR !! not defined: MBEDTLS_SSL_PROTO_DTLS " )
 #	define MBED_MISSING_DEFINE
 #endif
-#if !defined( MBEDTLS_NET_C )
-#	pragma message( "!! ERROR !! not defined: MBEDTLS_NET_C " )
-#	define MBED_MISSING_DEFINE
-#endif
-#if !defined( MBEDTLS_TIMING_C )
-#	pragma message( "!! ERROR !! not defined: MBEDTLS_TIMING_C " )
-#	define MBED_MISSING_DEFINE
-#endif
+// #if !defined( MBEDTLS_NET_C )
+// #	pragma message( "!! ERROR !! not defined: MBEDTLS_NET_C " )
+// #	define MBED_MISSING_DEFINE
+// #endif
+// #if !defined( MBEDTLS_TIMING_C )
+// #	pragma message( "!! ERROR !! not defined: MBEDTLS_TIMING_C " )
+// #	define MBED_MISSING_DEFINE
+// #endif
 #if !defined( MBEDTLS_ENTROPY_C )
 #	pragma message( "!! ERROR !! not defined: MBEDTLS_ENTROPY_C " )
 #	define MBED_MISSING_DEFINE
@@ -76,6 +85,8 @@
 #if defined( MBED_MISSING_DEFINE )
 #	pragma message( "!! FATAL !! mbed missing critical" )
 #else
+#	pragma message( " BUILDING MBED " )
+
 
 #	include "mbedtls/net_sockets.h"
 #	include "mbedtls/debug.h"
@@ -89,23 +100,9 @@
 #	include "mbedtls/check_config.h"
 
 
-unsigned int		   loop_last, loop_now = 0;
-mbedtls_timing_hr_time mbed_timer;
-
-struct counter_diff
-{
-	unsigned int now  = 0;
-	unsigned int last = 0;
-};
-
-struct color_counters
-{
-	counter_diff serial_rx;
-	counter_diff hue_tx;
-} counter;
 
 int hue_mbed_tx( mbedtls_ssl_context *ssl ) {
-	unsigned long t_last, t_now = mbedtls_timing_get_timer( &mbed_timer, 1 );
+
 	int			  ret, len, rx;
 
 	unsigned char message_template[] = {
@@ -157,27 +154,19 @@ int hue_mbed_tx( mbedtls_ssl_context *ssl ) {
 			return ret;
 		}
 		mbedtls_printf( "<----MESSAGE-- (hex) \n" );
-		counter.hue_tx.now++;
 
 		usleep( SLEEP_PERIOD );
-		loop_now += rx;
-		t_now = mbedtls_timing_get_timer( &mbed_timer, 0 );
-		;
-		if( t_now - t_last > 1000 ) {
-			mbedtls_printf( "%ims elapsed, %i colors updated, %i messages sent\n", ( t_now - t_last ), ( loop_now - loop_last ), ( counter.hue_tx.now - counter.hue_tx.last ) );
-			counter.hue_tx.last = counter.hue_tx.now;
-			loop_last			= loop_now;
-			t_last				= t_now;
-		}
+
+
 	}
 	return 0;
 }
 
 void exit_close_hue_stream( void ) {
 	if( hue_end_stream( ) ) {
-		logm( "closed hue stream successfully" );
+		ESP_LOGD(LOGT, "closed hue stream successfully" );
 	} else {
-		logm( "failed to close hue stream" )
+		ESP_LOGD(LOGT, "failed to close hue stream" )
 	}
 }
 
@@ -187,6 +176,9 @@ static void my_debug( void *ctx, int level, const char *file, int line, const ch
 	mbedtls_fprintf( (FILE *)ctx, "%s:%04d: %s", file, line, str );
 	fflush( (FILE *)ctx );
 }
+
+
+
 
 int hue_mbed_open_dtls( ) {
 	mbedtls_printf( "\n  . Beginning Mbed..." );
@@ -229,7 +221,7 @@ int hue_mbed_open_dtls( ) {
 	mbedtls_timing_delay_context delay_timer;
 
 #	if defined( MBEDTLS_DEBUG_C )
-	mbedtls_debug_set_threshold( DEBUG_LEVEL );
+	mbedtls_debug_set_threshold( 0 );
 #	endif
 
 	psk_identity		 = DFL_PSK_IDENTITY;
@@ -335,7 +327,7 @@ int hue_mbed_open_dtls( ) {
 
 	mbedtls_ssl_set_bio( &ssl, &server_fd, mbedtls_net_send, mbedtls_net_recv, mbedtls_net_recv_timeout );
 
-	mbedtls_ssl_set_timer_cb( &ssl, &delay_timer, mbedtls_timing_set_delay, mbedtls_timing_get_delay );
+	mbedtls_ssl_set_timer_cb( &ssl, &delay_timer, mbedtls_timing_set_delay, &mbedtls_timing_get_delay );
 
 	mbedtls_ssl_conf_handshake_timeout( &conf, 100, 60000 );
 
@@ -476,5 +468,6 @@ exit:
 	return ( ret );
 }
 
+#undef LOGT
 
 #endif

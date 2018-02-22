@@ -4,27 +4,11 @@
 #include "esp_log.h"
 #include "driver/timer.h"
 
+
 /* ESP32 */
 #define BAUD_RATE 115200
+#define MBEDTLS_TIMING_C
 
-
-#define logm(message) \
-	printf("\nLOG:\t (src) %s : %i ----\n", __FILE__, __LINE__); \
-	printf("LOG:\t(msg) %s\n", message);
-
-#ifdef DEBUG
-#define debug(message, ...) \
-	printf("\nLOG:\t (src) "); \
-	printf(__FILE__); \
-	printf(" : "); \
-	printf(__LINE__); \
-	println("----"); \
-	printf("LOG:\t(msg) "); \
-	printf(message, __VA_ARGS__); \
-	printf("\n");
-#else
-	#define debug(message, ...) 
-#endif
 
 /*
  ***************************************
@@ -33,15 +17,18 @@
  * LOG_TAG_* must be unique
  **************************************
  */
-#define LOG_DEFAULT_LEVEL ESP_LOG_DEBUG
+#define LOG_DEFAULT_LEVEL ESP_LOG_INFO
 #define LOG_TAG_WIFI "WiFi"
 #define LOG_TAG_WIFI_LEVEL ESP_LOG_VERBOSE
 #define LOG_TAG_MAIN "Main"
 #define LOG_TAG_MAIN_LEVEL ESP_LOG_DEBUG
 #define LOG_TAG_SPECTRUM "Spectrum"
 #define LOG_TAG_SPECTRUM_LEVEL ESP_LOG_VERBOSE
+#define LOG_TAG_INTR "time_intr"
+#define LOG_TAG_INTR_LEVEL ESP_LOG_VERBOSE
 
 
+#define HUE_DIRECT_FROM_FREQUENCY
 
 /////////////////////////////////
 // CONFIGURE COLOR DATA SOURCE //
@@ -51,7 +38,6 @@
 #define SOURCE_LOCAL_MIC
 
 /* hue stream , mbedtls */
-
 #define LIGHT_ID 0x0d
 
 #define SERVER_PORT "2100"
@@ -66,16 +52,13 @@
 #define READ_TIMEOUT_MS 1000
 #define MAX_RETRY       5
 
-#define DEBUG_LEVEL 0
-
-
 /* mbedtls */
 //#define SLEEP_PERIOD 1000000
 // #define SLEEP_PERIOD 100000
 #define SLEEP_PERIOD 50000
 
 // #define MBED_CONFIG_FILE "mbed_config.h"
-// #define CONFIG_MBEDTLS_SSL_PROTO_TLS1_1
+// #define CONFIG_MBEDTLS_SSL_PROTO_TLS1_2
 // #define CONFIG_MBEDTLS_SSL_PROTO_DTLS
 // #define MBEDTLS_NET_C
 // #define MBEDTLS_TIMING_C

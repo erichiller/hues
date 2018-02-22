@@ -2,15 +2,14 @@
 #include "esp_wifi.h"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "nvs_flash.h"
 #include "esp_event_loop.h"
 
 #include "net_wifi.h"
 #include "secrets.h"
 #include "config.h"
+#include "mbed.h"
 
 // see: http://esp-idf.readthedocs.io/en/latest/api-reference/wifi/esp_wifi.html
-
 
 
 static const char *log_tag_wifi = LOG_TAG_WIFI;
@@ -22,28 +21,6 @@ int CONNECTED_BIT = BIT0;
 void log_wifi_init( ) {
 	esp_log_level_set( log_tag_wifi, LOG_TAG_WIFI_LEVEL );
 }
-
-/**
-I (3110) WiFi: SYSTEM_EVENT_STA_CONNECTED
-D (3860) tcpip_adapter: if0 dhcpc cb
-D (3860) tcpip_adapter: if0 ip changed=1
-D (3860) event: SYSTEM_EVENT_STA_GOT_IP, ip:192.168.10.186, mask:255.255.255.0, gw:192.168.10.1
-I (3860) event: sta ip: 192.168.10.186, mask: 255.255.255.0, gw: 192.168.10.1
-[WiFi-event] event: 7
-Guru Meditation Error: Core  0 panic'ed (Interrupt wdt timeout on CPU0)
-Core 0 register dump:
-PC      : 0x4008977b  PS      : 0x00060034  A0      : 0x8008ad5f  A1      : 0x3ffb0590
-0x4008977b: vTaskExitCritical at C:/Users/ehiller/AppData/local/omega/system/msys/opt/esp-idf/components/freertos/tasks.c:3529
-
-A2      : 0x3ffb33e4  A3      : 0x00000000  A4      : 0x00060021  A5      : 0x3ffbea10
-A6      : 0x00000001  A7      : 0x00000000  A8      : 0xb33fffff  A9      : 0x000000ff
-A10     : 0x00000001  A11     : 0x00000000  A12     : 0x00060023  A13     : 0x00000001
-A14     : 0x00060023  A15     : 0x00000000  SAR     : 0x00000013  EXCCAUSE: 0x00000005
-EXCVADDR: 0x00000000  LBEG    : 0x4000c2e0  LEND    : 0x40000c2f6  LCOUNT  : 0x00000000
-Core 0 was running in ISR context:
-EPC1    : 0x4000bff0  EPC2    : 0x00000000  EPC3    : 0x00000000  EPC4    : 0x4008977b
-0x4008977b: vTaskExitCritical at C:/Users/ehiller/AppData/local/omega/system/msys/opt/esp-idf/components/freertos/tasks.c:3529
-**/
 
 esp_err_t WiFiEvent( void *ctx, system_event_t *event ) {
 	printf( "[WiFi-event] event: %i\n", (int)event->event_id );
@@ -59,6 +36,8 @@ esp_err_t WiFiEvent( void *ctx, system_event_t *event ) {
 			break;
 		case SYSTEM_EVENT_STA_START:	// ESP32 station start
 			ESP_LOGI( log_tag_wifi, "SYSTEM_EVENT_STA_START" );
+			ESP_ERROR_CHECK( esp_wifi_connect( ) );
+			ESP_LOGI( log_tag_wifi, "WIFI interface being connected" );
 			return ESP_OK;
 			break;
 		case SYSTEM_EVENT_STA_STOP:	// ESP32 station stop
@@ -80,15 +59,21 @@ esp_err_t WiFiEvent( void *ctx, system_event_t *event ) {
 		case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:	// the auth mode of AP connected by ESP32 station changed
 			ESP_LOGW( log_tag_wifi, "SYSTEM_EVENT_STA_AUTHMODE_CHANGE" );
 			return event->event_id;
+		/**
+		 * RECEIVED IP
+		 * Good to go ahead and do things
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		 **/
 		case SYSTEM_EVENT_STA_GOT_IP:	// ESP32 station got IP from connected AP
+			ESP_LOGI( log_tag_wifi, "SYSTEM_EVENT_STA_GOT_IP" );		
 			timer_start( TIMER_GROUP_0, TIMER_0 );
-			
-			printf( "SYSTEM_EVENT_STA_GOT_IP\n" );
+			// if ( hue_mbed_open_dtls() ) {
+			// 	ESP_LOGE( log_tag_wifi, "ERROR CONNECTING VIA MBED" );
+			// }
 			printf( "got ip:%s\n",
 					ip4addr_ntoa( &event->event_info.got_ip.ip_info.ip ) );
 			xEventGroupSetBits(wifi_event_group, CONNECTED_BIT);
-
-			ESP_LOGI( log_tag_wifi, "SYSTEM_EVENT_STA_GOT_IP" );
+			timer_set_alarm(TIMER_GROUP_0, TIMER_0, TIMER_ALARM_EN);
 			return ESP_OK;
 			break;
 		case SYSTEM_EVENT_STA_LOST_IP:	// ESP32 station lost IP and the IP is reset to 0
@@ -175,8 +160,6 @@ esp_err_t WiFiEvent( void *ctx, system_event_t *event ) {
 
 
 int net_wifi_connect( ) {
-	nvs_flash_init( );
-	ESP_LOGI( log_tag_wifi, "flash initialized" );
 
 	tcpip_adapter_init( );
 	ESP_LOGI( log_tag_wifi, "tcpip adapter initialized" );
@@ -204,9 +187,6 @@ int net_wifi_connect( ) {
 
 	ESP_ERROR_CHECK( esp_wifi_start( ) );
 	ESP_LOGI( log_tag_wifi, "WIFI interface started" );
-
-	ESP_ERROR_CHECK( esp_wifi_connect( ) );
-	ESP_LOGI( log_tag_wifi, "WIFI interface being connected" );
 
 	return 0;
 }

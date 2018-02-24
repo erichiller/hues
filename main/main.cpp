@@ -13,6 +13,7 @@
 #include "net_wifi.h"
 #include "time_intr.h"
 #include "spectrum.h"
+#include "http.h"
 
 
 
@@ -39,6 +40,7 @@ void log_init( ) {
 	log_main_init( );
 	log_spectrum_init( );
 	log_intr_init( );
+	log_http_init( );
 }
 
 

@@ -4,7 +4,7 @@
 
 
 #define MBEDTLS_NET_C
-#define MBEDTLS_TIMING_C
+#define MBEDTLS_TIMING_ALT
 
 #include <unistd.h>
 
@@ -43,14 +43,14 @@
 #	pragma message( "!! ERROR !! not defined: MBEDTLS_SSL_PROTO_DTLS " )
 #	define MBED_MISSING_DEFINE
 #endif
-// #if !defined( MBEDTLS_NET_C )
-// #	pragma message( "!! ERROR !! not defined: MBEDTLS_NET_C " )
-// #	define MBED_MISSING_DEFINE
-// #endif
-// #if !defined( MBEDTLS_TIMING_C )
-// #	pragma message( "!! ERROR !! not defined: MBEDTLS_TIMING_C " )
-// #	define MBED_MISSING_DEFINE
-// #endif
+#if !defined( MBEDTLS_NET_C )
+#	pragma message( "!! ERROR !! not defined: MBEDTLS_NET_C " )
+#	define MBED_MISSING_DEFINE
+#endif
+#if !defined( MBEDTLS_TIMING_C ) && !defined( MBEDTLS_TIMING_ALT )
+#	pragma message( "!! ERROR !! not defined: MBEDTLS_TIMING_C " )
+#	define MBED_MISSING_DEFINE
+#endif
 #if !defined( MBEDTLS_ENTROPY_C )
 #	pragma message( "!! ERROR !! not defined: MBEDTLS_ENTROPY_C " )
 #	define MBED_MISSING_DEFINE
@@ -94,7 +94,7 @@
 #	include "mbedtls/ctr_drbg.h"
 #	include "mbedtls/error.h"
 #	include "mbedtls/certs.h"
-#	include "mbedtls/timing.h"
+#	include "timing_alt.h"
 
 	/* Last order of business: CHECK CONFIG VALIDITY! */
 #	include "mbedtls/check_config.h"
@@ -135,7 +135,7 @@ int hue_mbed_tx( mbedtls_ssl_context *ssl ) {
 		rx = create_message( message, LIGHT_ID, red, green, blue );
 		if( rx <= 0 ) {
 			// create message returned an error
-			mbedtls_printf( " create message returned an error\n Exiting\n\n" );
+			ESP_LOGE( LOGT, " create message returned an error\n Exiting\n\n" );
 			exit( 1 );
 		}
 		// len = sizeof(message);
@@ -150,7 +150,7 @@ int hue_mbed_tx( mbedtls_ssl_context *ssl ) {
 		} while( ret == MBEDTLS_ERR_SSL_WANT_READ || ret == MBEDTLS_ERR_SSL_WANT_WRITE );
 
 		if( ret < 0 ) {
-			mbedtls_printf( " failed\n  ! mbedtls_ssl_write returned %d\n\n", ret );
+			ESP_LOGE( LOGT, " failed\n  ! mbedtls_ssl_write returned %d\n\n", ret );
 			return ret;
 		}
 		mbedtls_printf( "<----MESSAGE-- (hex) \n" );
@@ -166,7 +166,7 @@ void exit_close_hue_stream( void ) {
 	if( hue_end_stream( ) ) {
 		ESP_LOGD(LOGT, "closed hue stream successfully" );
 	} else {
-		ESP_LOGD(LOGT, "failed to close hue stream" )
+		ESP_LOGW(LOGT, "failed to close hue stream" )
 	}
 }
 
@@ -174,29 +174,22 @@ static void my_debug( void *ctx, int level, const char *file, int line, const ch
 	( (void)level );
 
 	mbedtls_fprintf( (FILE *)ctx, "%s:%04d: %s", file, line, str );
-	fflush( (FILE *)ctx );
+	//fflush( (FILE *)ctx );
 }
 
 
 
 
 int hue_mbed_open_dtls( ) {
-	mbedtls_printf( "\n  . Beginning Mbed..." );
-	mbedtls_printf( "\n  . ERIC ----> check on MBEDTLS_NET_PROTO_UDP: %i",
+	ESP_LOGD( LOGT, "\n  . Beginning Mbed..." );
+	ESP_LOGD( LOGT, "\n  . ERIC ----> check on MBEDTLS_NET_PROTO_UDP: %i",
 					MBEDTLS_NET_PROTO_UDP );
-	mbedtls_printf(
+	ESP_LOGD( LOGT,
 		"\n  . ERIC ----> check on MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256: %X",
 		MBEDTLS_TLS_PSK_WITH_AES_128_GCM_SHA256 );
 
 	// close hue at exit
 	atexit( exit_close_hue_stream );
-#	if defined( _WIN32 )
-	// int handler , for ctrl-c , etc
-	typedef void ( *SignalHandlerPointer )( int );
-	SignalHandlerPointer previousHandler;
-	// signal here https://msdn.microsoft.com/en-us/library/xdkz3x12.aspx
-	previousHandler = signal( SIGINT, SignalHandler );
-#	endif
 
 	int					ret, len;
 	mbedtls_net_context server_fd;
@@ -244,11 +237,11 @@ int hue_mbed_open_dtls( ) {
 	mbedtls_ctr_drbg_init( &ctr_drbg );
 
 	mbedtls_printf( "\n  . Seeding the random number generator..." );
-	fflush( stdout );
+	//fflush( stdout );
 
 	mbedtls_entropy_init( &entropy );
 	if( ( ret = mbedtls_ctr_drbg_seed( &ctr_drbg, mbedtls_entropy_func, &entropy, (const unsigned char *)pers, strlen( pers ) ) ) != 0 ) {
-		mbedtls_printf( " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret );
+		ESP_LOGE( LOGT, " failed\n  ! mbedtls_ctr_drbg_seed returned %d\n", ret );
 		goto exit;
 	}
 
@@ -259,7 +252,7 @@ int hue_mbed_open_dtls( ) {
     */
 
 	mbedtls_printf( "  . Loading the CA root certificate ..." );
-	fflush( stdout );
+	//fflush( stdout );
 
 	ret = mbedtls_x509_crt_parse( &cacert,
 								  (const unsigned char *)mbedtls_test_cas_pem,
@@ -276,7 +269,7 @@ int hue_mbed_open_dtls( ) {
     * 1. Start the connection
     */
 	mbedtls_printf( "  . Connecting to udp/%s/%s...", SERVER_NAME, SERVER_PORT );
-	fflush( stdout );
+	//fflush( stdout );
 
 	if( ( ret = mbedtls_net_connect( &server_fd, SERVER_ADDR, SERVER_PORT, MBEDTLS_NET_PROTO_UDP ) ) != 0 ) {
 		mbedtls_printf( " failed\n  ! mbedtls_net_connect returned %d\n\n", ret );
@@ -289,7 +282,7 @@ int hue_mbed_open_dtls( ) {
     * 2. Setup stuff
     */
 	mbedtls_printf( "  . Setting up the DTLS structure..." );
-	fflush( stdout );
+	//fflush( stdout );
 
 	if( ( ret = mbedtls_ssl_config_defaults( &conf, MBEDTLS_SSL_IS_CLIENT, MBEDTLS_SSL_TRANSPORT_DATAGRAM, MBEDTLS_SSL_PRESET_DEFAULT ) ) != 0 ) {
 		mbedtls_printf( " failed\n  ! mbedtls_ssl_config_defaults returned %d\n\n",
@@ -338,7 +331,7 @@ int hue_mbed_open_dtls( ) {
     */
 
 	mbedtls_printf( "  . Performing the SSL/TLS handshake..." );
-	fflush( stdout );
+	//fflush( stdout );
 
 	do
 		ret = mbedtls_ssl_handshake( &ssl );
@@ -363,7 +356,7 @@ int hue_mbed_open_dtls( ) {
 	if( ( flags = mbedtls_ssl_get_verify_result( &ssl ) ) != 0 ) {
 		char vrfy_buf[512];
 
-		mbedtls_printf( " failed\n" );
+		ESP_LOGE( LOGT, " failed\n" );
 
 		mbedtls_x509_crt_verify_info( vrfy_buf, sizeof( vrfy_buf ), "  ! ", flags );
 
@@ -376,7 +369,7 @@ int hue_mbed_open_dtls( ) {
     */
 send_request:
 	mbedtls_printf( "  > Write to server:" );
-	fflush( stdout );
+	//fflush( stdout );
 
 	// create message space
 	// char *mmessage = malloc(25 * sizeof(char));
@@ -389,7 +382,7 @@ send_request:
     * 7. Read the echo response
     */
 	mbedtls_printf( "  < Read from server:" );
-	fflush( stdout );
+	//fflush( stdout );
 
 	len = sizeof( buf ) - 1;
 	memset( buf, 0, sizeof( buf ) );
@@ -457,7 +450,7 @@ exit:
 
 #	if defined( _WIN32 )
 	mbedtls_printf( "  + Press Enter to exit this program.\n" );
-	fflush( stdout );
+	//fflush( stdout );
 	getchar( );
 #	endif
 

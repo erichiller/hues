@@ -7,8 +7,12 @@
 
 /* ESP32 */
 #define BAUD_RATE 115200
-#define MBEDTLS_TIMING_C
 
+
+// REQUEST TYPES
+#define HTTP_GET "GET"
+#define HTTP_POST "POST"
+#define HTTP_PUT "PUT"
 
 /*
  ***************************************
@@ -26,7 +30,39 @@
 #define LOG_TAG_SPECTRUM_LEVEL ESP_LOG_VERBOSE
 #define LOG_TAG_INTR "time_intr"
 #define LOG_TAG_INTR_LEVEL ESP_LOG_VERBOSE
+#define LOG_TAG_HTTP "Http"
+#define LOG_TAG_HTTP_LEVEL ESP_LOG_VERBOSE
 
+
+/*****
+ * Log Colors
+ * #define LOG_COLOR_BLACK   "30"
+ * #define LOG_COLOR_RED     "31"
+ * #define LOG_COLOR_GREEN   "32"
+ * #define LOG_COLOR_BROWN   "33"
+ * #define LOG_COLOR_BLUE    "34"
+ * #define LOG_COLOR_PURPLE  "35"
+ * #define LOG_COLOR_CYAN    "36"
+ ***/
+// add white for bolding
+#define LOG_COLOR_WHITE      "37"
+#define LOG_COLOR_WHITE_BR   "97"
+// defaults
+// #define LOG_COLOR_E       LOG_COLOR(LOG_COLOR_RED)
+// #define LOG_COLOR_W       LOG_COLOR(LOG_COLOR_BROWN)
+// edits
+#undef LOG_COLOR_I
+#define LOG_COLOR_I       LOG_COLOR(LOG_COLOR_BLUE)
+#undef LOG_COLOR_D
+#define LOG_COLOR_D	      LOG_COLOR(LOG_COLOR_GREEN)
+#undef LOG_COLOR_V
+#define LOG_COLOR_V       LOG_COLOR(LOG_COLOR_WHITE_BR)
+
+
+
+/***************************************
+ * HUE
+ ***************************************/
 
 #define HUE_DIRECT_FROM_FREQUENCY
 
@@ -43,6 +79,8 @@
 #define SERVER_PORT "2100"
 #define SERVER_NAME "Hue"
 #define SERVER_ADDR "192.168.10.46" /* forces IPv4 */
+// #define SERVER_ADDR "192.168.10.175" /* forces IPv4 */
+#define SERVER_API_PORT 80
 #define MESSAGE     "Echo this"
 
 #define DFL_PSK_IDENTITY "PKSaPQW6j-vRpcn9UPoNZ3Olm-Dd0EU0q-K9m-f7"

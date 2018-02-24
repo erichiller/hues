@@ -20,8 +20,8 @@
  *
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
-#ifndef MBEDTLS_TIMING_H
-#define MBEDTLS_TIMING_H
+#ifndef MBEDTLS_TIMING_ALT_H
+#define MBEDTLS_TIMING_ALT_H
 
 #if !defined(MBEDTLS_CONFIG_FILE)
 #include "config.h"
@@ -29,8 +29,8 @@
 #include MBEDTLS_CONFIG_FILE
 #endif
 
-#if !defined(MBEDTLS_TIMING_ALT)
-// Regular implementation
+#if defined(MBEDTLS_TIMING_ALT)
+// alternate
 //
 
 #include <stdint.h>

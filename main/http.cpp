@@ -36,7 +36,7 @@ int http_request( const char *host, int port, char *url, const char request_type
      * Start the connection
      */
 	printf( "\n  . Connecting to tcp/%s:%d...", host, port );
-	//fflush( stdout );
+	fflush( stdout );
 
 	if( ( server_host = gethostbyname( host ) ) == NULL ) {
 		printf( " failed\n  ! gethostbyname failed\n\n" );
@@ -88,7 +88,7 @@ int http_request( const char *host, int port, char *url, const char request_type
      * Write the GET request
      */
 	printf( "  > Writing to server...\n" );
-	//fflush( stdout );
+	fflush( stdout );
 
 
 
@@ -135,7 +135,7 @@ int http_request( const char *host, int port, char *url, const char request_type
      * Read the HTTP response
      */
 	printf( "  << Reading from server:\n" );
-	//fflush( stdout );
+	fflush( stdout );
 
 
 	struct timeval receiving_timeout;
@@ -148,49 +148,43 @@ int http_request( const char *host, int port, char *url, const char request_type
 	ESP_LOGD( LOGT ," . set socket receiving timeout success\n" );
 
 
-	/* Read HTTP response */
-	// do {
-	// 	ret = read( server_fd, buf, sizeof( buf ) - 1 );
-	// 	for( int i = 0; i < ret; i++ ) {
-	// 		putchar( buf[i] );
-	// 	}
-	// } while( ret > 0 );
-	// printf( " . done reading from socket. Last read return=%d errno=%d\r\n", ret, errno );
-	// 
-
 	len = 0;
-
 	do {
 		memset( buf, 0, sizeof( buf ) );
 		ret = read( server_fd, buf, sizeof( buf ) - 1 );
 		len += ret;
-		for( int i = 0; i < ret; i++ ) {
-			putchar( buf[i] );
-		}
+		// for( int i = 0; i < ret; i++ ) {
+		// 	putchar( buf[i] );
+		// }
 
 		if( strstr( (char *)buf, find_success_str ) != NULL ) {
 			found = 1;
 		}
 
 		if( ret == 0 ) {
-			printf( "\n %d bytes read ; %d total bytes read ; page complete\n\n", ret, len );
+			printf( "\n %d total bytes read ; page complete\n\n", len );
 			break;
 		} else if ( ret == -1 ){
 			ESP_LOGE( LOGT, "read() in httpc returned -1" );
 			found = false;
 		}
 
-		printf( "\n %d bytes read\n"
+		printf( "\n"
 				"%d total bytes read\n"
 				"---------- MESSAGE READ ----------\n"
 				"%s\n"
 				"-------- MESSAGE READ END --------\n"
-				, ret, len, (char *)buf );
+				, len, (char *)buf );
 	} while( ret > 0 );
 	printf( " . done reading from socket. Last read return=%d errno=%d\r\n", ret, errno );
 
 exit:
 	close( server_fd );
+
+	if ( !found ){
+		ESP_LOGE( LOGT, " http_request did NOT receive the sought after string in %s", __FILE__ );
+	}
+		
 
 	return ( found );
 }

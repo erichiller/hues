@@ -30,7 +30,7 @@ AllowShortCaseLabelsOnASingleLine: false
 
 AllowShortFunctionsOnASingleLine: Empty
 
-AllowShortIfStatementsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
 
 AllowShortLoopsOnASingleLine: false
 
@@ -49,7 +49,7 @@ BinPackParameters: false
 # only if BreakBeforeBraces is set to Custom
 BraceWrapping:
 #   AfterClass:      false
-#   AfterControlStatement: false
+  # AfterControlStatement: true
 #   AfterEnum:       false
 #   AfterFunction:   true
 #   AfterNamespace:  false
@@ -58,7 +58,7 @@ BraceWrapping:
   AfterUnion:      true
   # AfterExternBlock: false
 #   BeforeCatch:     false
-#   BeforeElse:      false
+  # BeforeElse:      true
 #   IndentBraces:    false
 #   SplitEmptyFunction: true
 #   SplitEmptyRecord: true
@@ -97,7 +97,9 @@ IncludeBlocks: Regroup
 
 IndentCaseLabels: true
 
-IndentPPDirectives: AfterHash
+# The preprocessor directive indenting style to use.
+# Options:    None      //or//      AfterHash
+IndentPPDirectives: None
 
 # try leaving blank, vscode defaults
 IndentWidth: 4
@@ -155,8 +157,9 @@ SpacesInSquareBrackets: false
 
 Standard:        Cpp11
 
-# again, try to use/inherit vscode's settings
+# It did not inherit vscode's settings
 TabWidth: 4
-# 
-# same here, try to inherit vscode's settings
-UseTab: Always
+
+# It did not inherit vscode's settings
+# ForIndentation      //or//           Always
+UseTab: ForIndentation

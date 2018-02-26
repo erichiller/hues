@@ -70,8 +70,8 @@ char	  commandBuffer[MAX_CHARS];
 /* Command Functions */
 
 int command_hue_start( void ) {
-	hue_mbed_open_dtls( );
-	printf( "hue_mbed_open_dtls() has been called\n" );
+	// hue_mbed_open_dtls( );
+	// printf( "hue_mbed_open_dtls() has been called\n" );
 	return 0;
 }
 

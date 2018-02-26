@@ -23,7 +23,11 @@
 		"types.h": "c",
 		"mbed.h": "c",
 		"timing.h": "c",
-		"esp_log.h": "c"
+		"esp_log.h": "c",
+		"ssl.h": "c",
+		"platform.h": "c",
+		"ssl_internal.h": "c",
+		"type_traits": "cpp"
 	},
 	"C_Cpp.formatting": "Default",
 	"C_Cpp.intelliSenseEngineFallback": "Enabled",
